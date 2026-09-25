@@ -3,10 +3,13 @@
    Static site, no build step. Reference: MEATWASH design mock-up (1440 grid).
    ========================================================================== */
 
-/* Заголовки — Arsenal SC из брендбука (стр. 2), тот же шрифт, что в знаке. */
-@font-face { font-family: 'Arsenal SC'; src: url('../assets/fonts/arsenal-sc-bold.woff2') format('woff2'); font-weight: 700; font-display: swap; }
-@font-face { font-family: 'Arsenal SC'; src: url('../assets/fonts/arsenal-sc-regular.woff2') format('woff2'); font-weight: 400; font-display: swap; }
-@font-face { font-family: 'Manrope'; src: url('../assets/fonts/manrope.woff2') format('woff2'); font-weight: 200 800; font-display: swap; }
+/* Шрифты брендбука: Arsenal SC (капительный, им набран логотип) и Arsenal —
+   та же семья в обычном начертании, под текст. Sloop Script из брендбука
+   латинский и лицензионный, он живёт только внутри логотипа. */
+@font-face { font-family: 'Arsenal SC'; src: url('../assets/fonts/arsenal-sc.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Arsenal SC'; src: url('../assets/fonts/arsenal-sc-bold.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Arsenal'; src: url('../assets/fonts/arsenal.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Arsenal'; src: url('../assets/fonts/arsenal-bold.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
 
 /* ---------- Design tokens ---------- */
 :root {
@@ -28,8 +31,8 @@
   --line: rgba(255, 255, 255, .15);
   --line-ink: rgba(26, 21, 18, .16);
 
-  --font-display: 'Arsenal SC', 'Manrope', Arial, sans-serif;
-  --font-sans: 'Manrope', 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Arsenal SC', 'Arsenal', 'Times New Roman', serif;
+  --font-sans: 'Arsenal', 'Inter', 'Helvetica Neue', Arial, sans-serif;
 
   --gutter: clamp(20px, 5.4vw, 104px);   /* 35px in the 652px mock-up */
   --header-h: clamp(64px, 6.9vw, 108px);
@@ -45,12 +48,12 @@ body {
   margin: 0;
   background: var(--black);
   color: var(--text);
-  font: 300 15px/1.6 var(--font-sans);
+  font: 400 15px/1.6 var(--font-sans);
   -webkit-font-smoothing: antialiased;
   overflow-x: clip;
 }
 h1, h2, h3, p, dl, dt, dd, figure { margin: 0; }
-h1, h2, h3 { font-family: var(--font-display); font-weight: 700; line-height: 1; }
+h1, h2 { font-family: var(--font-display); font-weight: 700; line-height: 1.04; }
 img { display: block; max-width: 100%; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
@@ -154,7 +157,7 @@ body.menu-open .burger span:last-child { transform: translateY(-3.5px) rotate(-4
   font-size: clamp(36px, 4.9vw, 72px); line-height: .98; text-transform: uppercase; letter-spacing: .015em;
   color: var(--ivory); text-shadow: 0 2px 40px rgba(0, 0, 0, .45);
 }
-.hero__sub { margin-top: clamp(10px, 1.4vw, 20px); font-size: clamp(15px, 1.75vw, 25px); font-weight: 300; color: var(--ivory); }
+.hero__sub { margin-top: clamp(10px, 1.4vw, 20px); font-size: clamp(15px, 1.75vw, 25px); font-weight: 400; color: var(--ivory); }
 
 /* Bottom bar: 01 / 04 · Кузов · line · thumbnails · SCROLL */
 .hero-bar {
@@ -201,7 +204,7 @@ body.menu-open .burger span:last-child { transform: translateY(-3.5px) rotate(-4
 .chapter__index span:last-child { font-size: clamp(9px, .75vw, 11px); color: var(--muted); letter-spacing: .08em; }
 .chapter__title { margin-top: clamp(14px, 1.7vw, 26px); font-size: clamp(38px, 4.15vw, 62px); text-transform: uppercase; letter-spacing: .01em; line-height: 1; }
 .chapter__kicker { display: block; margin-top: clamp(8px, .9vw, 14px); font-size: clamp(8px, .7vw, 10px); letter-spacing: .22em; text-transform: uppercase; color: var(--faint); }
-.chapter__lead { margin-top: clamp(18px, 2.3vw, 36px); font-size: clamp(15px, 1.55vw, 23px); font-weight: 300; color: var(--ivory); line-height: 1.25; }
+.chapter__lead { margin-top: clamp(18px, 2.3vw, 36px); font-size: clamp(15px, 1.55vw, 23px); font-weight: 400; color: var(--ivory); line-height: 1.25; }
 .chapter__text { margin-top: clamp(10px, 1.2vw, 18px); font-size: clamp(12px, .95vw, 14px); line-height: 1.6; color: var(--muted); max-width: 30ch; }
 .chapter .btn { margin-top: clamp(20px, 2.4vw, 36px); height: clamp(36px, 2.9vw, 42px); padding: 0 clamp(18px, 1.7vw, 26px); font-size: clamp(11px, .9vw, 13px); pointer-events: auto; }
 
@@ -273,7 +276,7 @@ body.menu-open .burger span:last-child { transform: translateY(-3.5px) rotate(-4
 }
 .about__stats div + div { position: relative; }
 .about__stats div + div::before { content: ''; position: absolute; left: 0; top: calc(-1 * clamp(9px, 1.2vw, 17px)); width: 10px; height: 1px; background: rgba(26, 21, 18, .35); }
-.about__stats dt { font-family: var(--font-sans); font-weight: 500; font-size: clamp(22px, 1.9vw, 28px); line-height: 1; letter-spacing: -.01em; }
+.about__stats dt { font-family: var(--font-display); font-weight: 700; font-size: clamp(22px, 1.9vw, 28px); line-height: 1; letter-spacing: .01em; }
 .about__stats dd { margin-top: 6px; font-size: clamp(9px, .78vw, 11px); color: var(--ink-soft); letter-spacing: .02em; white-space: nowrap; }
 
 /* ---------- Locations ---------- */
@@ -287,7 +290,7 @@ body.menu-open .burger span:last-child { transform: translateY(-3.5px) rotate(-4
   display: flex; flex-direction: column; background: var(--ivory-3); border: 1px solid var(--line-ink); border-right: 0;
   padding: clamp(18px, 2.4vw, 34px) clamp(18px, 2.4vw, 34px) clamp(14px, 1.9vw, 26px);
 }
-.location__card h3 { font-family: var(--font-display); font-weight: 700; font-size: clamp(18px, 1.65vw, 24px); letter-spacing: .01em; }
+.location__card h3 { font-family: var(--font-sans); font-weight: 400; font-size: clamp(18px, 1.65vw, 24px); letter-spacing: .01em; }
 .location__type { margin-top: 4px; font-size: clamp(11px, 1vw, 15px); color: var(--ink-soft); }
 .location__meta { margin-top: clamp(14px, 1.9vw, 28px); font-size: clamp(11px, .95vw, 14px); line-height: 1.7; color: var(--ink); }
 .location__card .link-arrow { margin-top: auto; padding-top: 16px; color: var(--ink); }
@@ -299,13 +302,15 @@ body.menu-open .burger span:last-child { transform: translateY(-3.5px) rotate(-4
 .membership {
   position: relative; z-index: 2; overflow: hidden;
   display: grid; grid-template-columns: 56% 44%; align-items: center;
-  min-height: clamp(220px, 16.5vw, 260px);
+  min-height: clamp(260px, 26vw, 400px);
   background: radial-gradient(90% 140% at 26% 48%, #5a0f14 0%, #4a0b10 38%, #3e0a0e 70%, #30070a 100%);
 }
 .membership::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(0, 0, 0, .55), rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, 0) 75%, rgba(0, 0, 0, .35)); }
-.membership__card { position: relative; align-self: stretch; overflow: hidden; }
+.membership__card { position: relative; align-self: stretch; overflow: hidden; display: grid; place-items: center; padding: clamp(18px, 2.4vw, 36px); }
+/* Карта нарисована из фирменного вектора и лежит с прозрачным фоном.
+   Никакого mix-blend-mode: он размывал карту в фон секции. */
 .membership__card img {
-  position: absolute; left: 14%; top: 10%; width: clamp(260px, 40vw, 580px); height: auto; mix-blend-mode: lighten;
+  width: clamp(230px, 33vw, 500px); height: auto;
   transform: translateY(14px); opacity: .001; transition: transform 1.4s var(--ease), opacity 1.2s var(--ease);
 }
 .membership__card.is-in img { transform: none; opacity: 1; }
@@ -342,7 +347,10 @@ body.menu-open .burger span:last-child { transform: translateY(-3.5px) rotate(-4
 .dialog__phones strong { font-weight: 400; }
 
 /* ---------- Reveal helpers ---------- */
-[data-reveal] { }
+/* Появление блоков при прокрутке: короткий подъём, без «киселя». */
+[data-reveal] { opacity: 0; transform: translateY(18px); transition: opacity 620ms var(--ease), transform 620ms var(--ease); }
+[data-reveal].is-in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { [data-reveal] { opacity: 1; transform: none; transition: none; } }
 
 /* ==========================================================================
    Responsive
@@ -376,9 +384,8 @@ body.menu-open .burger span:last-child { transform: translateY(-3.5px) rotate(-4
   .about__stats dd { white-space: normal; }
   .locations { grid-template-columns: 1fr; }
   .membership { grid-template-columns: 1fr; min-height: 0; }
-  .membership__card { height: clamp(200px, 40vw, 280px); }
-  .membership__card img { left: 50%; top: 10%; transform: translate(-50%, 14px); width: clamp(240px, 60vw, 440px); }
-  .membership__card.is-in img { transform: translate(-50%, 0); }
+  .membership__card { height: auto; padding: clamp(24px, 6vw, 40px) var(--gutter) 0; }
+  .membership__card img { width: clamp(220px, 58vw, 400px); }
   .membership__copy { padding: 0 var(--gutter) clamp(36px, 5vw, 48px); }
   .footer__row { flex-wrap: wrap; }
   .footer__nav { order: 3; width: 100%; margin-left: 0; }

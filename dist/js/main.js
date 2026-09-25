@@ -1,6 +1,7 @@
-import {STOPS,clamp,smooth} from './config.js';
+import {STOPS,clamp,smooth,LADDER} from './config.js';
 import {setupUI} from './ui.js';
 import {setupConfigurator} from './configurator.js';
+import {setupProof} from './proof.js';
 
 const $=s=>document.querySelector(s);
 const section=$('#scene'),canvas=$('#porsche'),poster=$('.scene__poster'),posterImage=$('.scene__poster img');
@@ -44,8 +45,11 @@ document.addEventListener('click',e=>{
  const open=e.target.closest('[data-cfg-open]');
  if(open){e.preventDefault();configurator.isOpen?configurator.close():configurator.open();}
 },{signal:controller.signal});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&configurator.isOpen)configurator.close();},{signal:controller.signal});
+// Esc обрабатывает сам гараж: сначала выход из ролика или кинорежима и только
+// потом закрытие панели. Здесь дубля быть не должно — он закрывал всё разом.
 const cleanupUI=setupUI(goToStop);
+// Шторки «до/после» живут отдельно от витрины: они работают и в статическом режиме.
+const cleanupProof=setupProof();
 
 function setVisibility(el,amount,interactive=true){
  el.style.opacity=amount.toFixed(3);
@@ -56,7 +60,7 @@ function apply(progress){
  const p=clamp(progress);state.progress=p;
  const intro=1-smooth(p,.008,.07);
  setVisibility(hero,intro);setVisibility(bar,1-smooth(p,.015,.09));setVisibility(dot,intro);
- canvas.style.opacity=scene?'1':'0';
+ 
  const index=Math.min(5,Math.floor(p*5+.5));
  section.firstElementChild.style.setProperty('--shade',String(smooth(p,.06,.15)*(1-smooth(p,.90,.97))));
  for(let i=0;i<chapters.length;i++){
@@ -79,9 +83,9 @@ function staticExperience(){
  staticMode=true;document.documentElement.classList.add('static-experience');
  tween?.kill();trigger?.kill();scene?.dispose();scene=null;
  for(const el of [...chapters,hero,finale]){el.style.opacity='1';el.style.transform='';el.inert=false;el.setAttribute('aria-hidden','false');}
- poster.style.opacity='1';posterImage.style.transform='';
- posterImage.src=posterImage.dataset.staticSrc;loading.hidden=true;
- canvas.style.opacity='0';section.dataset.mode=(motion.matches||forceStatic)?'reduced-motion':'static-fallback';
+ poster.hidden=false;poster.style.opacity='1';posterImage.style.transform='';
+ posterImage.src=posterImage.dataset.staticSrc;
+ section.dataset.mode=(motion.matches||forceStatic)?'reduced-motion':'static-fallback';
 }
 async function start(){
  if(motion.matches||forceStatic||navigator.connection?.saveData){staticExperience();return;}
@@ -90,17 +94,30 @@ async function start(){
  tween=gsap.to(state,{progress:1,ease:'none',onUpdate:()=>apply(state.progress),scrollTrigger:{trigger:section,start:'top top',end:'bottom bottom',scrub:1.35,invalidateOnRefresh:true}});
  trigger=tween.scrollTrigger;apply(clamp(scrollY/range()));
  try{
-  // Paint the interface first; the opening camera is already the live Porsche scene.
+  // Витрина на фотографиях вместо 3D: та же машина в четырёх состояниях.
+  // Кадры перекрёстно проявляются, поэтому переход всегда плавный.
   await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
   const started=performance.now();
-  // Fetch the model alongside the scene module, after the hero has painted.
-  const preload=document.createElement('link');preload.rel='preload';preload.as='fetch';preload.crossOrigin='anonymous';preload.href='assets/porsche-930-optimized.glb';document.head.append(preload);
-  const {createScene}=await import('./scene.bundle.js');const loaded=await createScene(canvas);
+  const {createStage}=await import('./stage.js');
+  const st=createStage(document.querySelector('.stage-mount'));
+  LADDER.forEach(step=>st.preload(step.shot));
+  const loaded={
+   stage:st,
+   // прокрутка ведёт машину по состояниям
+   update(p){const i=Math.min(LADDER.length-1,Math.floor(clamp(p)*LADDER.length));st.ladder(LADDER[i].shot);},
+   // гараж услуг подменяет кадр напрямую
+   setManual(spec){
+    if(!spec){this.update(state.progress);return;}
+    if(spec.pair)st.showPair(spec.pair.before,spec.pair.after);
+    else st.shot(spec.shot);
+   },
+   resize(){},dispose(){st.destroy();},
+  };
   section.dataset.loadMs=String(Math.round(performance.now()-started));
-  if(destroyed||motion.matches){loaded.dispose();return;}
-  scene=loaded;loading.hidden=true;section.dataset.mode='webgl';apply(state.progress);
+  if(destroyed)return;
+  scene=loaded;section.dataset.mode='photo';apply(state.progress);
  }catch(error){
-  console.warn('Porsche scene unavailable; static service photographs remain available.',error);
+  console.warn('Витрина не поднялась, остаётся статический вариант.',error);
   staticExperience();
  }
 }
@@ -112,6 +129,6 @@ addEventListener('scroll',()=>header.classList.toggle('is-solid',scrollY>90),{pa
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)scene?.resize();},{signal:controller.signal});
 motion.addEventListener('change',()=>{if(motion.matches)staticExperience();else location.reload();},{signal:controller.signal});
 canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();staticExperience();},{signal:controller.signal});
-addEventListener('pagehide',event=>{if(event.persisted)return;destroyed=true;cancelAnimationFrame(resizeFrame);tween?.kill();trigger?.kill();scene?.dispose();lcpObserver?.disconnect();cleanupUI();configurator.destroy();controller.abort();},{once:true});
+addEventListener('pagehide',event=>{if(event.persisted)return;destroyed=true;cancelAnimationFrame(resizeFrame);tween?.kill();trigger?.kill();scene?.dispose();lcpObserver?.disconnect();cleanupUI();cleanupProof();configurator.destroy();controller.abort();},{once:true});
 document.fonts.ready.then(()=>window.ScrollTrigger?.refresh());
 if(document.readyState==='loading')addEventListener('DOMContentLoaded',start,{once:true});else start();

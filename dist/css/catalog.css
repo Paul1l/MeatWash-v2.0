@@ -8,7 +8,7 @@
 .catalog{padding:110px var(--gutter);background:#0d0b0a;color:var(--ivory)}
 .catalog [id],.catalog{scroll-margin-top:calc(var(--header-h) + 24px)}
 .catalog__heading{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:end;margin-bottom:80px}
-.catalog h2{font-size:clamp(36px,4.2vw,66px);line-height:1.12;letter-spacing:.01em;margin-top:24px}
+.catalog h2{font-size:clamp(34px,3.9vw,60px);line-height:1.1;letter-spacing:.006em;margin-top:24px}
 .catalog__heading>p{max-width:44ch;justify-self:end;font-size:15px;line-height:1.9;color:var(--muted)}
 .catalog__section{display:grid;grid-template-columns:26% 1fr;gap:7%;padding-top:50px;margin-top:65px;border-top:1px solid var(--line)}
 .catalog__aside h3,.catalog__concierge h3{font-size:clamp(26px,2.5vw,40px);line-height:1.2;margin:20px 0}

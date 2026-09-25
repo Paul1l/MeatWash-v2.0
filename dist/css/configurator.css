@@ -3,12 +3,13 @@
 .cfg-mount{ position:absolute; inset:0; pointer-events:none; z-index:6; }
 
 .cfg{
-  position:absolute; right:clamp(14px,3vw,40px); top:50%;
-  transform:translateY(-50%);
+  position:absolute; right:clamp(14px,3vw,40px);
+  top:clamp(76px,11vh,104px); bottom:clamp(64px,9vh,92px);
   width:min(340px,86vw);
+  display:flex; flex-direction:column;
   padding:22px 22px 18px;
-  background:rgba(8,8,8,.86);
-  backdrop-filter:blur(10px);
+  background:linear-gradient(180deg,rgba(10,8,8,.72),rgba(8,8,8,.78));
+  backdrop-filter:blur(20px) saturate(1.1);
   border:1px solid rgba(233,223,208,.14);
   border-radius:4px;
   pointer-events:auto;
@@ -47,7 +48,7 @@
 .cfg__item input:focus-visible + .cfg__box{ outline:2px solid #e9dfd0; outline-offset:2px; }
 
 .cfg__text{ display:flex; flex-direction:column; gap:2px; line-height:1.25; }
-.cfg__text b{ font-size:14.5px; font-weight:500; }
+.cfg__text b{ font-size:14.5px; font-weight:700; }
 .cfg__text i{ font-style:normal; font-size:12.5px; color:#9a8f80; }
 
 .cfg__total{
@@ -56,7 +57,7 @@
   border-top:1px solid rgba(233,223,208,.14);
   font-size:13px; color:#9a8f80;
 }
-.cfg__total b{ font-size:19px; color:#e9dfd0; font-weight:500; }
+.cfg__total b{ font-size:19px; color:#e9dfd0; font-weight:700; font-family:var(--font-display); }
 
 .cfg__act{ display:grid; grid-template-columns:1fr auto; gap:8px; }
 .cfg__act .btn{ min-height:46px; }
@@ -112,20 +113,40 @@ body.cfg-open .scene__skip{
 }
 body.cfg-open .chapter-nav{ display:none; }
 
-/* Кнопка открытия — под шапкой справа. Внизу слева она наезжала на «Записаться»
-   в hero: высота блока hero зависит от окна. Справа сверху в сцене ничего нет. */
+/* Кнопка открытия — в правом верхнем углу сцены.
+   Слева и снизу кадр занимают заголовки глав, финал и «Все услуги»; справа
+   сверху пусто на всей прокрутке, поэтому кнопка нигде ни на что не налезает. */
 .scene__cfg{
-  position:absolute; right:var(--gutter); top:calc(var(--header-h) + 20px);
-  z-index:7; min-height:44px; padding:10px 18px;
-  background:rgba(8,8,8,.7); backdrop-filter:blur(8px);
-  border:1px solid rgba(233,223,208,.22); border-radius:3px;
+  position:absolute; right:clamp(14px,3vw,40px);
+  top:calc(var(--header-h) + clamp(12px,1.8vw,26px));
+  z-index:7; min-height:46px; padding:12px 20px;
+  display:inline-flex; align-items:center; gap:10px;
+  background:rgba(8,8,8,.62); backdrop-filter:blur(10px);
+  border:1px solid rgba(233,223,208,.26); border-radius:3px;
   color:#e9dfd0; font:inherit; font-size:13px; letter-spacing:.04em;
-  cursor:pointer; transition:border-color .18s ease, background .18s ease;
+  cursor:pointer; transition:border-color .18s ease, background .18s ease, transform .18s ease;
 }
-.scene__cfg:hover{ border-color:#861A22; background:rgba(134,26,34,.28); }
+.scene__cfg::after{ content:'→'; color:rgba(233,223,208,.6); transition:transform .18s ease, color .18s ease; }
+.scene__cfg:hover{ border-color:#861A22; background:rgba(134,26,34,.32); }
+.scene__cfg:hover::after{ transform:translateX(3px); color:#e9dfd0; }
 .scene__cfg[aria-expanded="true"]{ background:#861A22; border-color:#861A22; }
+/* Панель выезжает справа — кнопка уходит налево, чтобы не лечь на заголовок. */
+body.cfg-open .scene__cfg{ right:auto; left:clamp(14px,3vw,40px); }
+
+/* Подсказка про шторку: появляется только там, где есть честная пара «до/после». */
+.cfg__pairhint{
+  display:none; align-items:center; gap:8px;
+  margin:10px 0 0; padding:9px 12px;
+  border:1px solid rgba(233,223,208,.18); border-radius:3px;
+  background:rgba(233,223,208,.04);
+  font-size:12px; line-height:1.4; color:rgba(233,223,208,.74);
+}
+.cfg__pairhint::before{ content:'↔'; font-size:15px; color:#e9dfd0; }
+.cfg.has-pair .cfg__pairhint{ display:flex; }
 @media (max-width:720px){
-  .scene__cfg{ top:calc(env(safe-area-inset-top,0px) + var(--header-h) + 12px); right:16px; }
+  /* Над нижней кнопкой записи, а не поверх неё. */
+  .scene__cfg{ top:auto; right:auto; bottom:calc(env(safe-area-inset-bottom,0px) + 62px); left:50%; transform:translateX(-50%); }
+  body.cfg-open .scene__cfg{ bottom:auto; top:calc(env(safe-area-inset-top,0px) + 76px); }
 }
 
 /* Шапка панели с крестиком. */
@@ -143,3 +164,162 @@ body.cfg-open .chapter-nav{ display:none; }
 /* Нижняя кнопка записи на телефоне уходит, пока открыта примерочная:
    у панели есть своя, и две подряд перекрывали друг друга. */
 body.cfg-open .mobile-cta{ visibility:hidden; }
+
+/* ── Гараж услуг ──────────────────────────────────────────────────────────── */
+/* Панель стала выше: группы работ, готовые наборы и режим показа.            */
+
+.cfg__presets{ display:grid; grid-template-columns:repeat(3,1fr); gap:4px; margin:0 0 16px; }
+.cfg__preset{
+  display:grid; gap:2px; padding:9px 8px; text-align:left; cursor:pointer;
+  background:rgba(233,223,208,.05); border:1px solid rgba(233,223,208,.12);
+  border-radius:3px; color:inherit; font:inherit;
+  transition:background .18s ease, border-color .18s ease;
+}
+.cfg__preset:hover{ background:rgba(134,26,34,.28); border-color:rgba(134,26,34,.7); }
+.cfg__preset b{ font-size:12px; font-weight:700; letter-spacing:.02em; }
+.cfg__preset i{ font-style:normal; font-size:10px; line-height:1.25; color:#9a8f80; }
+
+.cfg__scroll{ max-height:min(42vh,340px); overflow-y:auto; margin:0 -6px 14px; padding:0 6px;
+  scrollbar-width:thin; scrollbar-color:rgba(233,223,208,.25) transparent;
+  /* Нижний край списка растворяется: видно, что список продолжается,
+     и строки не обрываются посередине. */
+  -webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 26px),transparent 100%);
+  mask-image:linear-gradient(180deg,#000 calc(100% - 26px),transparent 100%); }
+.cfg__scroll::-webkit-scrollbar{ width:4px; }
+.cfg__scroll::-webkit-scrollbar-thumb{ background:rgba(233,223,208,.25); border-radius:2px; }
+
+.cfg__group + .cfg__group{ margin-top:12px; }
+.cfg__grouptitle{
+  margin:0 0 4px; font-size:10px; font-weight:700;
+  letter-spacing:.18em; text-transform:uppercase; color:#9a8f80;
+}
+.cfg__group .cfg__list{ margin-bottom:0; }
+
+.cfg__act{ display:flex; flex-wrap:wrap; gap:6px; }
+.cfg__act .btn{ flex:1 1 auto; }
+.cfg .btn[disabled]{ opacity:.4; pointer-events:none; }
+.cfg.is-playing [data-show]{ border-color:rgba(134,26,34,.9); color:#e9dfd0; background:rgba(134,26,34,.45); }
+
+/* Подпись работы во время показа — она же остаётся в кадре при съёмке. */
+.cfg-stage{
+  position:absolute; left:clamp(14px,4vw,64px); bottom:clamp(20px,6vh,64px);
+  width:min(420px,70vw); pointer-events:none;
+}
+.cfg-stage[hidden]{ display:none; }
+.cfg-stage__title{
+  margin:0 0 6px; font-family:var(--font-display,serif);
+  font-size:clamp(24px,3.4vw,40px); line-height:1.06; color:#e9dfd0;
+  text-shadow:0 2px 24px rgba(0,0,0,.6);
+}
+.cfg-stage__caption{
+  margin:0 0 14px; max-width:36ch; font-size:14px; line-height:1.5;
+  color:rgba(233,223,208,.76); text-shadow:0 1px 16px rgba(0,0,0,.6);
+}
+.cfg-stage__bar{ height:2px; background:rgba(233,223,208,.2); overflow:hidden; }
+.cfg-stage__bar i{ display:block; height:100%; background:#861A22; transform:scaleX(0); transform-origin:left; }
+
+/* Кинорежим: панель убрана, в кадре только машина и подпись. */
+.cfg-fold{
+  position:absolute; right:clamp(14px,3vw,40px); bottom:clamp(14px,3vh,28px);
+  padding:8px 14px; cursor:pointer; pointer-events:auto;
+  background:rgba(8,8,8,.7); border:1px solid rgba(233,223,208,.16);
+  border-radius:3px; color:rgba(233,223,208,.8);
+  font:inherit; font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+  transition:opacity .2s ease, border-color .2s ease;
+}
+.cfg-fold:hover{ border-color:rgba(233,223,208,.4); color:#e9dfd0; }
+.cfg-fold[hidden]{ display:none; }
+body.cfg-cinema .cfg{ opacity:0; pointer-events:none; }
+body.cfg-cinema .cfg-fold{ opacity:.35; }
+body.cfg-cinema .cfg-fold:hover{ opacity:1; }
+
+/* Вкладки групп — только на телефоне: панель остаётся низкой полосой,
+   машина не закрывается, а все четыре группы всё равно доступны. */
+.cfg__tabs{ display:none; }
+
+@media (max-width:720px){
+  /* Панель — нижний лист: не выше 56% экрана, машина всегда видна. */
+  .cfg{ max-height:56svh; }
+  .cfg__presets{ grid-template-columns:repeat(3,1fr); margin-bottom:10px; }
+  .cfg__preset{ padding:7px 8px; }
+  .cfg__preset i{ display:none; }
+
+  .cfg__tabs{
+    display:flex; gap:4px; margin:0 -14px 10px; padding:0 14px 2px;
+    overflow-x:auto; scrollbar-width:none;
+  }
+  .cfg__tabs::-webkit-scrollbar{ height:0; }
+  .cfg__tab{
+    flex:0 0 auto; padding:7px 11px; cursor:pointer;
+    background:none; border:1px solid rgba(233,223,208,.14); border-radius:3px;
+    color:#9a8f80; font:inherit; font-size:11px;
+    letter-spacing:.12em; text-transform:uppercase;
+  }
+  .cfg__tab.is-on{ background:#861A22; border-color:#861A22; color:#e9dfd0; }
+
+  /* Видна только выбранная группа — её заголовок уже написан на вкладке. */
+  .cfg__scroll{ max-height:none; overflow:visible; margin-bottom:12px; }
+  .cfg__group{ display:none; }
+  .cfg__group + .cfg__group{ margin-top:0; }
+  .cfg__grouptitle{ display:none; }
+  .cfg[data-group="wash"]    .cfg__group[data-group="wash"],
+  .cfg[data-group="paint"]   .cfg__group[data-group="paint"],
+  .cfg[data-group="cabin"]   .cfg__group[data-group="cabin"],
+  .cfg[data-group="protect"] .cfg__group[data-group="protect"]{ display:block; }
+
+  /* «Записаться» и «Показ» в ряд, «Ролик» и «Сбросить» — вторым рядом. */
+  .cfg__act{ display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+
+  /* Кнопка кинорежима уходит наверх: внизу её накрывал нижний лист. */
+  .cfg-fold{ bottom:auto; top:calc(env(safe-area-inset-top,0px) + 76px); right:14px; }
+  body.cfg-open .scene__cfg{ left:14px; transform:none; }
+
+  .cfg-stage{ left:16px; right:16px; width:auto; bottom:calc(env(safe-area-inset-bottom,0) + 84px); }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .cfg-stage__bar i{ transition:none; }
+}
+
+/* Панель — колонка: шапка и итог закреплены, список забирает остаток. */
+.cfg__head{ flex:0 0 auto; }
+.cfg__presets{ flex:0 0 auto; }
+.cfg__scroll{ flex:1 1 auto; max-height:none; min-height:0; }
+.cfg__total, .cfg__act, .cfg__note{ flex:0 0 auto; }
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/* Ролик: в кадре остаётся машина и подпись работы — это заготовка под съёмку. */
+
+.cfg-stage__price{
+  margin:0 0 12px; font-family:var(--font-display,serif);
+  font-size:clamp(15px,1.5vw,19px); color:rgba(233,223,208,.92);
+  text-shadow:0 1px 16px rgba(0,0,0,.6);
+}
+.cfg-stage__hint{
+  display:none; margin:12px 0 0;
+  font-size:10px; letter-spacing:.18em; text-transform:uppercase;
+  color:rgba(233,223,208,.3);
+}
+.cfg-stage.is-film .cfg-stage__hint{ display:block; }
+
+/* Подпись в ролике крупнее и со знаком из логобука. */
+.cfg-stage.is-film{ width:min(560px,80vw); }
+.cfg-stage.is-film .cfg-stage__title{ font-size:clamp(30px,4.4vw,56px); }
+.cfg-stage.is-film .cfg-stage__title::before{
+  content:''; display:block; width:clamp(34px,3.4vw,46px); height:clamp(34px,3.4vw,46px);
+  margin:0 0 14px; opacity:.85;
+  background:url('../assets/brand/Bull_Logo.svg') left center / contain no-repeat;
+}
+
+body.cfg-film .header,
+body.cfg-film .scene__cfg,
+body.cfg-film .mobile-cta,
+body.cfg-film .cfg,
+body.cfg-film .cfg-fold{
+  opacity:0; pointer-events:none; visibility:hidden;
+}
+body.cfg-film .cfg-stage{ pointer-events:none; }
+
+@media (prefers-reduced-motion:reduce){
+  .cfg-stage__bar i{ transition:none; }
+}

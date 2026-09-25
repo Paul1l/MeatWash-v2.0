@@ -1,0 +1,151 @@
+/* ==========================================================================
+   «До и после» + широкая полоса кадра. Работает поверх токенов style.css.
+   ========================================================================== */
+
+.proof {
+  padding: clamp(64px, 8vw, 132px) var(--gutter) clamp(56px, 7vw, 116px);
+  background: var(--black-2);
+  border-top: 1px solid var(--line);
+}
+.proof__head {
+  display: grid;
+  gap: clamp(16px, 2vw, 28px);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 38ch);
+  align-items: end;
+  margin-bottom: clamp(32px, 4vw, 60px);
+}
+.proof__head h2 { font-size: clamp(30px, 4.4vw, 62px); }
+.proof__head p { color: var(--muted); max-width: 44ch; }
+
+.proof__grid {
+  display: grid;
+  gap: clamp(18px, 2.2vw, 34px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* ---------- шторка ---------- */
+.ba { position: relative; margin: 0; }
+.ba__frame {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #000;
+  aspect-ratio: 16 / 9;
+  touch-action: pan-y;
+  cursor: ew-resize;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.ba__img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+.ba__clip { position: absolute; inset: 0; clip-path: inset(0 50% 0 0); will-change: clip-path; }
+.ba.is-dragging .ba__frame { cursor: grabbing; }
+
+.ba__handle {
+  position: absolute; top: 0; bottom: 0; left: 50%;
+  width: 44px; margin-left: -22px;
+  display: grid; place-items: center;
+  cursor: ew-resize;
+  touch-action: none;
+}
+.ba__handle::before {
+  content: ''; position: absolute; top: 0; bottom: 0; left: 50%;
+  width: 1px; margin-left: -.5px;
+  background: rgba(233, 223, 208, .85);
+  box-shadow: 0 0 18px rgba(0, 0, 0, .8);
+}
+.ba__grip {
+  position: relative;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(233, 223, 208, .85);
+  background: rgba(8, 8, 8, .58);
+  backdrop-filter: blur(6px);
+  display: grid; place-items: center;
+  transition: transform var(--t) var(--ease), background var(--t) var(--ease);
+}
+.ba__grip::before {
+  content: '‹ ›';
+  font: 400 13px/1 var(--font-sans);
+  letter-spacing: .12em;
+  color: var(--text);
+}
+.ba__frame:hover .ba__grip, .ba.is-dragging .ba__grip { transform: scale(1.08); background: rgba(77, 13, 17, .72); }
+.ba__handle:focus-visible { outline: none; }
+.ba__handle:focus-visible .ba__grip { outline: 1px solid var(--beige); outline-offset: 4px; }
+
+.ba__tag {
+  position: absolute; top: 14px;
+  font: 400 10px/1 var(--font-sans);
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: rgba(233, 223, 208, .82);
+  background: rgba(8, 8, 8, .55);
+  border: 1px solid var(--line);
+  padding: 7px 11px;
+  pointer-events: none;
+}
+.ba__tag--b { left: 14px; }
+.ba__tag--a { right: 14px; }
+
+.ba__cap {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: clamp(16px, 2vw, 26px);
+  display: grid; gap: 5px;
+  background: linear-gradient(0deg, rgba(8, 8, 8, .95) 0%, rgba(8, 8, 8, .78) 45%, rgba(8, 8, 8, 0) 100%);
+  pointer-events: none;
+}
+.ba__cap b { font: 400 clamp(16px, 1.5vw, 21px)/1.2 var(--font-display); }
+.ba__cap i { font-style: normal; color: var(--muted); font-size: clamp(12px, 1.05vw, 14px); }
+
+/* ---------- широкая полоса кадра ---------- */
+.band {
+  position: relative;
+  min-height: clamp(340px, 52vh, 620px);
+  display: grid;
+  align-items: end;
+  overflow: hidden;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.band__img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: 50% 58%;
+}
+.band::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(8, 8, 8, .62) 0%, rgba(8, 8, 8, .08) 38%, rgba(8, 8, 8, .86) 100%);
+}
+/* Ширину задаём в пикселях: 62ch считались от мелкого шрифта блока,
+   и цитата в 44px разваливалась на пять коротких строк. */
+.band__text {
+  position: relative; z-index: 1;
+  padding: clamp(28px, 5vw, 76px) var(--gutter);
+  display: grid; gap: 12px;
+  width: min(100%, 880px);
+}
+.band__text blockquote { margin: 0; font: 400 clamp(22px, 3vw, 44px)/1.18 var(--font-display); }
+.band__text cite { font-style: normal; color: var(--faint); font-size: 12px; letter-spacing: .22em; text-transform: uppercase; }
+
+/* Узкий экран: подпись уходит под кадр — в кадре остаётся только работа. */
+@media (max-width: 900px) {
+  .proof__head { grid-template-columns: 1fr; align-items: start; }
+  .proof__grid { grid-template-columns: 1fr; }
+  .ba__cap {
+    position: static;
+    background: none;
+    padding: 14px 2px 0;
+  }
+  .ba__cap b { font-size: 17px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ba__grip { transition: none; }
+}

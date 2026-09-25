@@ -1,0 +1,93 @@
+/* Витрина на фотографиях вместо 3D-сцены. */
+
+/* Точка вставки сама растягивается на всю сцену: иначе .stage цепляется
+   за случайного позиционированного предка. */
+.stage-mount{ position:absolute; inset:0; z-index:0; }
+
+.stage{ position:absolute; inset:0; overflow:hidden; background:#080808; }
+
+/* Пока открыт гараж, кадр уходит из-под панели и целиком помещается слева.
+   Раньше панель ложилась чёрным на треть кадра и закрывала корму машины. */
+@media (min-width:901px){
+  /* Пока открыт гараж, кадр занимает свободную область целиком и по пропорции
+     самой фотографии: панель больше не ложится чёрным на корму машины, а
+     шторка и подписи совпадают с краями кадра. */
+  body.cfg-open .stage{
+    right:calc(min(340px,86vw) + clamp(14px,3vw,40px) - 34px);
+    top:50%; bottom:auto; height:auto;
+    aspect-ratio:1600 / 894; max-height:100%;
+    transform:translateY(-50%);
+  }
+  body.cfg-open .stage__layer{
+    background-size:contain; background-position:50% 50% !important;
+    animation:none; transform:none;
+  }
+  body.cfg-open .stage__pairimg{ object-fit:contain; object-position:50% 50% !important; }
+}
+@media (prefers-reduced-motion:reduce){ .stage{ transition:none; } }
+
+/* Два слоя крест-накрест: переход между кадрами всегда плавный. */
+.stage__layer{
+  position:absolute; inset:0;
+  background-size:cover; background-repeat:no-repeat; background-position:50% 50%;
+  opacity:0; transition:opacity .62s cubic-bezier(.4,0,.2,1);
+  will-change:opacity;
+  transform:scale(1.035);
+  animation:stage-drift 26s ease-in-out infinite alternate;
+}
+.stage__layer.is-on{ opacity:1; }
+
+/* Медленный наезд — кадр дышит, но ничего не перерисовывается. */
+@keyframes stage-drift{
+  from{ transform:scale(1.035) translate3d(0,0,0); }
+  to  { transform:scale(1.085) translate3d(-1.2%,-0.8%,0); }
+}
+
+/* ── шторка «до/после» ─────────────────────────────────────────────────── */
+.stage__pair{ position:absolute; inset:0; touch-action:none; cursor:ew-resize; }
+.stage__pair[hidden]{ display:none; }
+.stage__pairimg{
+  position:absolute; inset:0; width:100%; height:100%;
+  object-fit:cover; user-select:none; -webkit-user-drag:none;
+}
+.stage__clip{ position:absolute; inset:0; clip-path:inset(0 50% 0 0); }
+
+.stage__handle{
+  position:absolute; top:0; bottom:0; left:50%; width:2px;
+  background:rgba(233,223,208,.9); transform:translateX(-1px);
+  box-shadow:0 0 0 1px rgba(8,8,8,.45), 0 0 24px rgba(8,8,8,.5);
+  cursor:ew-resize;
+}
+.stage__handle:focus-visible{ outline:2px solid #e9dfd0; outline-offset:4px; }
+.stage__grip{
+  position:absolute; top:50%; left:50%; width:46px; height:46px;
+  transform:translate(-50%,-50%); border-radius:50%;
+  background:rgba(8,8,8,.72); border:1px solid rgba(233,223,208,.55);
+  backdrop-filter:blur(6px);
+}
+.stage__grip::before,.stage__grip::after{
+  content:""; position:absolute; top:50%; width:0; height:0;
+  border-top:5px solid transparent; border-bottom:5px solid transparent;
+  transform:translateY(-50%);
+}
+.stage__grip::before{ left:12px; border-right:7px solid #e9dfd0; }
+.stage__grip::after { right:12px; border-left:7px solid #e9dfd0; }
+.is-dragging .stage__grip{ background:#861A22; border-color:#861A22; }
+
+.stage__tag{
+  /* Метки сверху: внизу кадра идёт подпись работы во время показа. */
+  position:absolute; top:clamp(16px,3.4vh,30px);
+  padding:5px 11px; border-radius:3px;
+  background:rgba(8,8,8,.62); backdrop-filter:blur(6px);
+  color:rgba(233,223,208,.86);
+  font-size:10px; letter-spacing:.2em; text-transform:uppercase;
+  pointer-events:none;
+}
+.stage__tag--b{ left:clamp(16px,4vw,44px); }
+.stage__tag--a{ right:clamp(16px,4vw,44px); }
+/* Кадр сам ужимается до свободной области, поэтому сдвигать метку не нужно. */
+.stage:not(.has-pair) .stage__tag{ opacity:0; }
+
+@media (prefers-reduced-motion:reduce){
+  .stage__layer{ animation:none; transform:none; transition-duration:.25s; }
+}
