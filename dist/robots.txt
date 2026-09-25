@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://paul1l.github.io/MeatWash-v1.0/sitemap.xml

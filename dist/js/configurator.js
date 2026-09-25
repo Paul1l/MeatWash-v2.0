@@ -14,7 +14,10 @@ const FILM_LEAD = 900;     // чистая пауза в начале ролик
 
 export function setupConfigurator({ mount, getScene, onOpen, onClose }) {
   const picked = new Set();
+  // Все слушатели панели снимаются разом в destroy().
+  const abort = new AbortController(), options = { signal: abort.signal };
   let open = false;
+  let opener = null;       // кнопка, которой открыли гараж: на неё возвращается фокус
 
   // Показ
   let show = null;       // { order:[id], index, until, timer }
@@ -24,10 +27,10 @@ export function setupConfigurator({ mount, getScene, onOpen, onClose }) {
   let filmStartedAt = 0;
 
   mount.innerHTML = `
-    <div class="cfg" hidden>
+    <div class="cfg" id="cfg-panel" role="region" aria-labelledby="cfg-title" tabindex="-1" hidden>
       <div class="cfg__head">
         <p class="cfg__eyebrow">Гараж услуг</p>
-        <h3 class="cfg__title">Соберите уход и смотрите на машину</h3>
+        <h3 class="cfg__title" id="cfg-title">Соберите уход и смотрите на машину</h3>
         <button class="cfg__close" type="button" data-cfg-close aria-label="Закрыть гараж услуг">×</button>
       </div>
 
@@ -98,8 +101,9 @@ export function setupConfigurator({ mount, getScene, onOpen, onClose }) {
   const total = mount.querySelector('[data-total]');
   const showBtn = mount.querySelector('[data-show]');
   const filmBtn = mount.querySelector('[data-film]');
+  const bookBtn = mount.querySelector('.cfg [data-book]');
 
-  const OVERLAYS = '.hero, .hero-bar, .hero__dot, .chapter, .finale, .scene__skip';
+  const OVERLAYS = '.hero, .hero-bar, .chapter, .finale, .scene__skip';
   const freezeOverlays = (on) => {
     document.querySelectorAll(OVERLAYS).forEach((el) => { el.inert = on; });
   };
@@ -135,10 +139,13 @@ export function setupConfigurator({ mount, getScene, onOpen, onClose }) {
   }
 
   function refreshTotal() {
-    total.textContent = picked.size
-      ? 'от ' + money([...picked].reduce((s, id) => s + byId(id).from, 0))
-      : '—';
+    const sum = [...picked].reduce((s, id) => s + byId(id).from, 0);
+    total.textContent = picked.size ? 'от ' + money(sum) : '—';
     showBtn.disabled = picked.size < 1;
+    // Состав уходит в окно записи через data-book-context — так же, как у всех
+    // кнопок записи на странице; окно само пишет «Вы выбрали: …».
+    if (picked.size) bookBtn.dataset.bookContext = [...picked].map((id) => byId(id).title).join(', ') + ' · ориентир от ' + money(sum);
+    else delete bookBtn.dataset.bookContext;
   }
 
   function syncInputs() {
@@ -285,7 +292,7 @@ export function setupConfigurator({ mount, getScene, onOpen, onClose }) {
     refreshTotal();
     stopShow(true);
     retarget(input.checked ? input.value : null);
-  });
+  }, options);
 
   panel.addEventListener('click', (e) => {
     const tab = e.target.closest('[data-tab]');
@@ -320,36 +327,35 @@ export function setupConfigurator({ mount, getScene, onOpen, onClose }) {
       return;
     }
 
-    if (e.target.closest('[data-book]') && picked.size) {
-      const names = [...picked].map((id) => byId(id).title);
-      const sum = [...picked].reduce((s, id) => s + byId(id).from, 0);
-      setTimeout(() => {
-        const line = document.querySelector('#booking p');
-        if (line) line.textContent = 'Вы собрали: ' + names.join(', ') + '. Ориентир — от ' + money(sum) + '. Филиал и время выбираются в онлайн-записи.';
-        api.close();
-      }, 0);
-    }
-  });
+    // «Записаться» открывает общий интерфейс (ui.js) с выбором филиала:
+    // панель только уходит с экрана, состав уже лежит в data-book-context.
+    if (e.target.closest('[data-book]')) api.close();
+  }, options);
 
-  cinemaBtn.addEventListener('click', () => setCinema(!cinema));
+  cinemaBtn.addEventListener('click', () => setCinema(!cinema), options);
 
 
 
   const onKey = (e) => {
     if (!open) return;
+    // Открытое окно (запись, услуга) закрывает Esc само: панель при этом не трогаем.
+    if (document.querySelector('dialog[open]')) return;
     if (e.key === 'Escape') {
       if (film) return stopShow();
       if (cinema) return setCinema(false);
       if (show) return stopShow();
       api.close();
     }
-    if (e.key === ' ' && picked.size) { e.preventDefault(); show ? stopShow() : startShow(); }
+    // Пробел запускает показ, только если фокус не на элементе, которому пробел нужен самому.
+    const own = e.target.closest?.('input, button, a[href], select, textarea, summary, [role="slider"], [contenteditable]');
+    if (e.key === ' ' && picked.size && !own) { e.preventDefault(); show ? stopShow() : startShow(); }
   };
 
   const api = {
-    open() {
+    open(button) {
       if (open || !getScene()) return;
       open = true;
+      opener = button || document.querySelector('[data-cfg-open]');
       panel.hidden = false;
       cinemaBtn.hidden = false;
       document.body.classList.add('cfg-open');
@@ -358,6 +364,8 @@ export function setupConfigurator({ mount, getScene, onOpen, onClose }) {
       refreshTotal();
       retarget(null);
       onOpen?.();
+      // Фокус — в панель; preventScroll: панель и так на экране, страница не должна дёргаться.
+      panel.focus({ preventScroll: true });
     },
     close() {
       if (!open) return;
@@ -373,11 +381,15 @@ export function setupConfigurator({ mount, getScene, onOpen, onClose }) {
       freezeOverlays(false);
       getScene()?.setManual(null);
       onClose?.();
+      // Фокус — обратно на кнопку гаража, без прокрутки к ней: панель могла
+      // закрыться из-за того, что сцена ушла с экрана.
+      if (panel.contains(document.activeElement) || document.activeElement === document.body) opener?.focus({ preventScroll: true });
+      opener = null;
     },
     get isOpen() { return open; },
     film: () => { if (!open) api.open(); startFilm(); },
     selected: () => [...picked],
-    destroy() { stopShow(true); document.removeEventListener('click', onFilmClick); document.removeEventListener('keydown', onKey); freezeOverlays(false); },
+    destroy() { abort.abort(); stopShow(true); document.removeEventListener('click', onFilmClick); document.removeEventListener('keydown', onKey); freezeOverlays(false); },
   };
   // ?film в адресе — страница сама открывает гараж и проигрывает все работы
   // без интерфейса. Так снимается ролик: открыл ссылку, включил запись.

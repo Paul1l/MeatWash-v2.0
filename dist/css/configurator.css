@@ -1,10 +1,10 @@
-/* Примерочная: панель поверх сцены. Цвет знака из логобука — #861A22. */
+/* Гараж услуг: панель поверх фото-витрины. Цвет знака из логобука — #861A22. */
 
 .cfg-mount{ position:absolute; inset:0; pointer-events:none; z-index:6; }
 
 .cfg{
   position:absolute; right:clamp(14px,3vw,40px);
-  top:clamp(76px,11vh,104px); bottom:clamp(64px,9vh,92px);
+  top:max(clamp(76px,11vh,104px), calc(var(--header-h) + 12px)); bottom:clamp(64px,9vh,92px);
   width:min(340px,86vw);
   display:flex; flex-direction:column;
   padding:22px 22px 18px;
@@ -12,6 +12,7 @@
   backdrop-filter:blur(20px) saturate(1.1);
   border:1px solid rgba(233,223,208,.14);
   border-radius:4px;
+  overflow:auto; overscroll-behavior:contain;
   pointer-events:auto;
 }
 .cfg[hidden]{ display:none; }
@@ -62,7 +63,7 @@
 .cfg__act{ display:grid; grid-template-columns:1fr auto; gap:8px; }
 .cfg__act .btn{ min-height:46px; }
 
-.cfg__note{ margin:14px 0 0; font-size:11.5px; line-height:1.45; color:#7d7468; }
+.cfg__note{ margin:14px 0 0; font-size:11.5px; line-height:1.5; color:var(--muted); }
 
 /* На телефоне панель — низкая полоса: услуги идут чипами в одну строку,
    чтобы машина осталась на виду. */
@@ -75,12 +76,12 @@
   }
   .cfg__title{ display:none; }
   .cfg__eyebrow{ margin-bottom:10px; }
-  .cfg__head{ padding-right:30px; }
-  .cfg__close{ top:-4px; right:-4px; }
+  .cfg__head{ padding-right:44px; }
+  .cfg__close{ top:-6px; right:-6px; }
   .cfg__list{
     grid-auto-flow:column; grid-auto-columns:minmax(148px,1fr);
     gap:8px; margin-bottom:12px;
-    overflow-x:auto; overscroll-behavior-x:contain;
+    overflow-x:auto; overflow-y:hidden; overscroll-behavior-x:contain;
     scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;
     padding-bottom:4px; scrollbar-width:none; -ms-overflow-style:none;
   }
@@ -104,7 +105,6 @@
 /* Пока примерочная открыта, сцену освобождаем: на экране только машина и панель. */
 body.cfg-open .hero,
 body.cfg-open .hero-bar,
-body.cfg-open .hero__dot,
 body.cfg-open .chapter,
 body.cfg-open .finale,
 body.cfg-open .scene__skip{
@@ -116,11 +116,15 @@ body.cfg-open .chapter-nav{ display:none; }
 /* Кнопка открытия — в правом верхнем углу сцены.
    Слева и снизу кадр занимают заголовки глав, финал и «Все услуги»; справа
    сверху пусто на всей прокрутке, поэтому кнопка нигде ни на что не налезает. */
+/* Кнопка есть, только когда витрина готова: body.cfg-ready ставит main.js.
+   В статичном режиме и при ошибке загрузки класса нет, и гаража нет. */
+.scene__cfg{ display:none; }
+body.cfg-ready .scene__cfg{ display:inline-flex; }
 .scene__cfg{
   position:absolute; right:clamp(14px,3vw,40px);
   top:calc(var(--header-h) + clamp(12px,1.8vw,26px));
   z-index:7; min-height:46px; padding:12px 20px;
-  display:inline-flex; align-items:center; gap:10px;
+  align-items:center; gap:10px;
   background:rgba(8,8,8,.62); backdrop-filter:blur(10px);
   border:1px solid rgba(233,223,208,.26); border-radius:3px;
   color:#e9dfd0; font:inherit; font-size:13px; letter-spacing:.04em;
@@ -152,8 +156,8 @@ body.cfg-open .scene__cfg{ right:auto; left:clamp(14px,3vw,40px); }
 /* Шапка панели с крестиком. */
 .cfg__head{ position:relative; padding-right:34px; }
 .cfg__close{
-  position:absolute; right:-6px; top:-8px;
-  width:34px; height:34px; display:grid; place-items:center;
+  position:absolute; right:-8px; top:-10px;
+  width:44px; height:44px; display:grid; place-items:center;
   background:none; border:0; border-radius:3px;
   color:#9a8f80; font-size:24px; line-height:1; cursor:pointer;
   transition:color .18s ease, background .18s ease;
@@ -164,6 +168,10 @@ body.cfg-open .scene__cfg{ right:auto; left:clamp(14px,3vw,40px); }
 /* Нижняя кнопка записи на телефоне уходит, пока открыта примерочная:
    у панели есть своя, и две подряд перекрывали друг друга. */
 body.cfg-open .mobile-cta{ visibility:hidden; }
+/* То же для кнопки в шапке: пока открыта панель, главная кнопка записи — в ней.
+   Панель закрывается сама, когда витрина уходит с экрана (main.js), поэтому
+   ниже сцены кнопки записи не пропадают. */
+body.cfg-open .header__cta{ opacity:0; visibility:hidden; }
 
 /* ── Гараж услуг ──────────────────────────────────────────────────────────── */
 /* Панель стала выше: группы работ, готовые наборы и режим показа.            */
@@ -322,4 +330,25 @@ body.cfg-film .cfg-stage{ pointer-events:none; }
 
 @media (prefers-reduced-motion:reduce){
   .cfg-stage__bar i{ transition:none; }
+}
+
+/* Низкое широкое окно (телефон в альбомной): панель остаётся справа, как на
+   десктопе, но блоки не сжимаются в ноль — панель прокручивается целиком.
+   Снизу место под «Скрыть панель». */
+@media (max-height:600px) and (min-width:721px){
+  .cfg{ top:calc(var(--header-h) + 8px); bottom:60px; padding:14px 16px 12px; }
+  .cfg > *{ flex-shrink:0; }
+  .cfg__scroll{ flex:0 0 auto; overflow:visible; -webkit-mask-image:none; mask-image:none; }
+  .cfg__note{ display:none; }
+}
+
+/* Ноутбук с низким окном (1366×657, 1280×720): панель ниже шапки, и на список
+   работ оставалась одна строка. Подзаголовок и подписи наборов убираем —
+   название панели остаётся в «Гараж услуг», наборы читаются по заголовкам. */
+@media (min-width:721px) and (max-height:760px){
+  .cfg{ padding-top:16px; }
+  .cfg__title{ display:none; }
+  .cfg__eyebrow{ margin-bottom:12px; }
+  .cfg__presets{ margin-bottom:12px; }
+  .cfg__preset i{ display:none; }
 }

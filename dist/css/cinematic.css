@@ -1,27 +1,24 @@
 /* Cinematic layer. Reference typography/grid remain in style.css. */
-:root { --background:#080808; --surface:#1d1511; --foreground:#e9dfd0; --border:rgba(255,255,255,.15); --space:8px; --container:1728px; }
 html { scroll-behavior:auto; }
-.header,.header.is-solid, body.menu-open .header { background:#080808; backdrop-filter:none; }
-.scene { height:780svh; }
+.header,.header.is-solid, body.menu-open .header { background:var(--black); backdrop-filter:none; }
+/* Путь до прайса был почти восемь экранов прокрутки — доли глав те же, трек короче. */
+.scene { height:600svh; }
 .scene__sticky { height:100svh; isolation:isolate; }
-.scene__poster,.scene__fallback,#porsche { position:absolute; inset:0; width:100%; height:100%; }
+.scene__poster { position:absolute; inset:0; width:100%; height:100%; }
 .scene__poster { display:none; z-index:1; pointer-events:none; overflow:hidden; }
-.scene__poster img,.scene__fallback img { width:100%; height:100%; object-fit:cover; }
+.scene__poster img { width:100%; height:100%; object-fit:cover; }
 .scene__poster img { object-position:50% 45%; transform-origin:60% 53%; }
-.scene__fallback { opacity:0; }
-#porsche { opacity:0; }
-.scene__loading { position:absolute; z-index:2; top:calc(var(--header-h) + 24px); left:var(--gutter); font-size:12px; color:var(--muted); }
-.scene__shade { z-index:1; background:linear-gradient(0deg,rgba(8,8,8,.72),transparent 45%,transparent 83%,rgba(8,8,8,.3)); }
-.scene__sticky::after { z-index:1; background:linear-gradient(90deg,#080808 0%,rgba(8,8,8,.96) 20%,rgba(8,8,8,.55) 32%,transparent 50%); }
+.scene__shade { z-index:1; background:linear-gradient(0deg,rgb(var(--black-rgb)/.72),transparent 45%,transparent 83%,rgb(var(--black-rgb)/.3)); }
+.scene__sticky::after { z-index:1; background:linear-gradient(90deg,var(--black) 0%,rgb(var(--black-rgb)/.96) 20%,rgb(var(--black-rgb)/.55) 32%,transparent 50%); }
 .hero { bottom:14.5%; }
 .hero__eyebrow { color:var(--muted); font-size:11px; letter-spacing:.25em; margin-bottom:20px; }
-.hero__booking { margin-top:28px; }
-.hero__title { font-size:clamp(46px,5.5vw,90px); line-height:.96; letter-spacing:.005em; }
-.hero__sub { margin-top:32px; }
+.hero__actions { margin-top:clamp(20px,2.4vw,32px); }
+/* Размеры hero живут здесь (этот файл перекрывает style.css). MEATWASH уже есть
+   знаком в шапке — в hero это разреженная строка-подпись, главная фраза — обещание. */
+.hero__title { font-size:clamp(20px,1.9vw,30px); line-height:1; letter-spacing:.16em; }
+.hero__sub { margin-top:14px; font-size:clamp(28px,3.3vw,52px); }
 .hero-bar { bottom:4%; }
-.hero-bar__progress,.hero-bar__thumbs,.hero__dot { display:none; }
 .hero-bar { display:flex; justify-content:flex-end; }
-.hero__dot i { animation:none; }
 .chapter { width:min(30vw,440px); top:50%; transform:translateY(-50%); }
 .chapter__title { font-size:clamp(42px,4.1vw,68px); line-height:1.02; letter-spacing:.008em; }
 .chapter__break { display:block; }
@@ -29,70 +26,73 @@ html { scroll-behavior:auto; }
 .chapter__lead { font-size:clamp(18px,1.55vw,24px); }
 .chapter__text { font-size:14px; }
 .chapter__kicker { font-size:10px; }
-.chapter-nav { position:absolute; z-index:3; left:11.5vw; bottom:32px; display:flex; align-items:center; gap:22px; }
-.chapter-nav button { font-size:12px; color:var(--muted); width:30px; height:44px; }
+.chapter-nav { position:absolute; z-index:3; left:11.5vw; bottom:32px; display:flex; align-items:center; gap:6px; }
+/* Номера глав — цель 44×44 без прибавки визуального веса: центрируем в боксе. */
+.chapter-nav button { display:inline-flex; align-items:center; justify-content:center; min-width:44px; height:44px; font-size:12px; color:var(--muted); }
 .chapter-nav button[aria-current] { color:var(--ivory); }
-.chapter-nav__line { height:1px; width:90px; background:var(--line); }
+.chapter-nav__line { height:1px; width:90px; margin-left:12px; background:var(--line); }
 .chapter-nav__line i { display:block; height:1px; width:0; background:var(--ivory); }
-.scene__skip { position:absolute; z-index:3; bottom:34px; right:var(--gutter); color:var(--muted); font-size:12px; opacity:0; visibility:hidden; padding:12px 0; }
+.scene__skip { position:absolute; z-index:3; bottom:34px; right:var(--gutter); display:inline-flex; align-items:center; min-height:44px; padding:0 2px; color:var(--muted); font-size:12px; opacity:0; visibility:hidden; }
+.scene__skip.is-visible:hover { color:var(--ivory); }
 .scene__skip.is-visible { opacity:1; visibility:visible; }
 .finale { position:absolute; z-index:2; left:var(--gutter); bottom:11%; opacity:0; pointer-events:none; }
-.finale h2 { font-size:clamp(42px,5.4vw,88px); margin:16px 0 20px; letter-spacing:.005em; }
+/* Финал сцены — не заголовок раздела: те же начертание и размер на абзаце. */
+.finale p.finale__title { font-family:var(--font-display); font-weight:700; line-height:1.04; font-size:clamp(42px,5.4vw,88px); margin:16px 0 20px; letter-spacing:.005em; }
 .finale p { color:var(--ivory); margin-bottom:24px; }
 .finale:not([inert]) { pointer-events:auto; }
 .card__caption { opacity:1; transform:none; }
-.card::after { background:linear-gradient(0deg,rgba(8,8,8,.48),transparent 40%,rgba(8,8,8,.48)); }
+.card::after { background:linear-gradient(0deg,rgb(var(--black-rgb)/.48),transparent 40%,rgb(var(--black-rgb)/.48)); }
 .card { transition:filter .5s ease; }
 .card:hover { filter:brightness(1.12); }
 .membership__card img { opacity:1; transform:none; }
-.service-dialog { max-height:85svh; overflow:auto; width:min(92vw,570px); }
+.service-dialog { width:min(92vw,570px); }
 .service-prices { margin:24px 0 0; }
 .service-prices div { display:flex; justify-content:space-between; gap:24px; padding:13px 0; border-top:1px solid var(--line); font-size:13px; }
 .service-prices dd { white-space:nowrap; }
 .service-dialog .btn { width:100%; }
 body:has(dialog[open]) { overflow:hidden; }
 body.menu-open { overflow:hidden; }
-.credits-link { display:inline-block; padding:0 4px; }
+/* Цель 44px; отрицательные поля не дают ссылке раздвинуть строку подвала. */
+.credits-link { display:inline-flex; align-items:center; justify-content:center; min-width:44px; min-height:44px; margin-block:-12px; }
 .dialog::backdrop { backdrop-filter:none; }
-.location__photo img { filter:none; }
-.footer__social a { width:40px; height:40px; }
-@media(min-width:1700px) { .hero__title { font-size:108px; } }
+@media(min-width:1700px) { .hero__title { font-size:32px; } .hero__sub { font-size:56px; } }
 @media(max-width:1100px) { .chapter { left:var(--gutter); width:37vw; } .chapter__title { font-size:54px; } .chapter-nav { left:var(--gutter); } }
+/* Портрет до 900px: запись — только в нижней кнопке, поэтому в hero и финале её нет.
+   Блок стоит выше блока 800px, чтобы телефонные значения перебивали планшетные. */
+@media(max-width:900px) and (orientation:portrait) {
+  .hero__booking, .finale .btn { display:none; }
+  .mobile-cta { bottom:max(12px,env(safe-area-inset-bottom)); height:46px; box-shadow:0 0 0 8px var(--black); }
+  body:has(dialog[open]) .mobile-cta { visibility:hidden; }
+  .chapter-nav { bottom:72px; }
+  .scene__skip { bottom:72px; }
+}
 @media(max-width:800px) and (orientation:portrait) {
   :root { --gutter:16px; }
-  .scene { height:690svh; }
-  .header { background:#080808; border-bottom:1px solid var(--line); }
-  .brand__name { font-size:24px; }
+  .scene { height:540svh; }
+  .header { background:var(--black); border-bottom:1px solid var(--line); }
   .scene__poster img { object-position:55% 35%; }
   .hero { bottom:116px; }
-  .hero__title { font-size:clamp(36px,10.4vw,65px); line-height:.95; }
-  .hero__sub { margin-top:16px; font-size:14px; }
-  .hero__booking { display:none; }
+  .hero__title { font-size:clamp(17px,4.6vw,21px); line-height:1; letter-spacing:.16em; }
+  .hero__sub { margin-top:10px; font-size:clamp(25px,7.2vw,32px); }
+  .hero__actions { margin-top:16px; }
   .hero-bar { bottom:85px; row-gap:12px; }
-  .hero-bar__thumbs { gap:8px; }
-  .hero-bar .thumb { width:60px; height:42px; }
-  .chapter { top:auto; bottom:116px; left:16px; right:16px; width:auto; transform:none; }
+  .chapter { top:auto; bottom:116px; left:var(--gutter); right:var(--gutter); width:auto; transform:none; }
   .chapter__index { flex-direction:row; align-items:center; gap:12px; }
   .chapter__index span:first-child { font-size:12px; }
   .chapter__title { font-size:clamp(30px,8.6vw,44px); margin-top:12px; }
   .chapter__break { display:inline; white-space:pre; }
   .chapter[data-chapter=ceramic] .chapter__title,.chapter[data-chapter=polish] .chapter__title { font-size:clamp(29px,8vw,44px); }
-  .chapter__title br { display:none; }
-  .chapter__title br::after { content:' '; }
   .chapter__kicker { margin-top:10px; }
   .chapter__lead { font-size:17px; margin-top:14px; }
   .chapter__text { font-size:13px; line-height:1.5; max-width:36ch; margin-top:8px; }
   .chapter .btn { height:38px; margin-top:16px; }
-  .chapter-nav { left:16px; bottom:66px; gap:12px; }
-  .chapter-nav__line { width:60px; }
-  .scene__skip { bottom:76px; right:16px; font-size:11px; }
-  .scene__sticky::after { background:linear-gradient(0deg,#080808 0%,rgba(8,8,8,.95) 25%,rgba(8,8,8,.18) 49%,transparent 63%); }
-  .scene__shade { background:linear-gradient(0deg,rgba(8,8,8,.94),transparent 58%); }
-  .finale { bottom:120px; right:16px; }
-  .finale h2 { font-size:44px; }
-  .finale .btn { display:none; }
-  .mobile-cta { bottom:max(12px,env(safe-area-inset-bottom)); height:46px; box-shadow:0 0 0 8px #080808; }
-  body:has(dialog[open]) .mobile-cta { visibility:hidden; }
+  .chapter-nav { left:var(--gutter); bottom:66px; gap:0; }
+  .chapter-nav__line { width:60px; margin-left:8px; }
+  .scene__skip { bottom:76px; right:var(--gutter); font-size:11px; padding:0 4px; }
+  .scene__sticky::after { background:linear-gradient(0deg,var(--black) 0%,rgb(var(--black-rgb)/.95) 25%,rgb(var(--black-rgb)/.18) 49%,transparent 63%); }
+  .scene__shade { background:linear-gradient(0deg,rgb(var(--black-rgb)/.94),transparent 58%); }
+  .finale { bottom:120px; right:var(--gutter); }
+  .finale p.finale__title { font-size:44px; }
   .about__copy { padding-bottom:24px; }
   .location__meta { font-size:13px; }
   .about__stats dt { font-size:24px; }
@@ -103,29 +103,33 @@ body.menu-open { overflow:hidden; }
   .chapter__lead { font-size:15px; margin-top:12px; }
   .chapter__text { font-size:12px; }
   .chapter .btn { margin-top:12px; }
-  .chapter-nav,.scene__skip { bottom:0; }
+  .scene__skip { bottom:0; }
+  /* Номера глав — справа над «Все услуги»: слева на низком экране они касались «Подробнее». */
+  .chapter-nav { left:auto; right:var(--gutter); bottom:44px; }
 }
 /* Compact landscape windows need a single-row footer beneath the hero copy. */
 @media(max-width:900px) and (orientation:landscape) {
   .hero { bottom:100px; }
-  .hero__title { font-size:clamp(30px,6vw,48px); }
-  .hero__sub { font-size:14px; margin-top:14px; }
+  .hero__eyebrow { margin-bottom:10px; }
+  .hero__title { font-size:clamp(16px,2.1vw,19px); }
+  .hero__sub { font-size:clamp(21px,3.5vw,30px); margin-top:8px; }
+  .hero__actions { margin-top:14px; }
   .hero-bar { bottom:24px; grid-template-columns:1fr auto; }
-  .hero-bar__thumbs { display:none; }
-  .hero__dot { display:none; }
 }
 /* No animation: genuine static frames, with no pinned multi-screen empty track. */
 .static-experience .scene { height:auto; }
 .static-experience .scene__sticky { position:relative; height:auto; overflow:visible; }
-.static-experience #porsche,.static-experience .scene__fallback,.static-experience .scene__shade,.static-experience .scene__sticky::after,.static-experience .hero-bar,.static-experience .hero__dot,.static-experience .chapter-nav,.static-experience .scene__skip { display:none; }
+.static-experience .stage-mount,.static-experience .scene__shade,.static-experience .scene__sticky::after,.static-experience .hero-bar,.static-experience .chapter-nav,.static-experience .scene__skip { display:none; }
 .static-experience .scene__poster { display:block; height:100svh; }
 .static-experience .hero { position:relative; left:auto; bottom:auto; height:100svh; padding:60svh var(--gutter) 70px; max-width:none; }
-.static-experience .chapter { position:relative; inset:auto; min-height:90svh; width:100%; opacity:1; padding:20svh 11.5vw 10svh; transform:none; background:linear-gradient(90deg,#080808,transparent 80%),var(--static-image) center/cover; pointer-events:auto; }
+.static-experience .chapter { position:relative; inset:auto; min-height:90svh; width:100%; opacity:1; padding:20svh 11.5vw 10svh; transform:none; background:linear-gradient(90deg,var(--black),transparent 80%),var(--static-image) center/cover; pointer-events:auto; }
 .static-experience .chapter[data-chapter=body] { --static-image:url('../assets/shots/cf-foam-crop.webp'); }
 .static-experience .chapter[data-chapter=interior] { --static-image:url('../assets/shots/cf-interior-seat.webp'); }
 .static-experience .chapter[data-chapter=polish] { --static-image:url('../assets/shots/cf-rq-bay.webp'); }
 .static-experience .chapter[data-chapter=ceramic] { --static-image:url('../assets/shots/cf-bead-macro.webp'); }
 .static-experience .finale { position:relative; inset:auto; opacity:1; padding:70px var(--gutter); }
+/* Статичные главы на телефоне — на общем поле страницы, а не на 11.5vw. */
+@media(max-width:800px) and (orientation:portrait) { .static-experience .chapter { padding:16svh var(--gutter) 10svh; } }
 @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; } }
 
 @media (max-width: 640px) {

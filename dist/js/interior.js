@@ -7,6 +7,10 @@ export function buildInterior(scene, car){
  const g=shell.geometry,position=g.attributes.position,old=g.index,keep=[],a=new THREE.Vector3(),b=new THREE.Vector3(),c=new THREE.Vector3();
  for(let i=0;i<(old?old.count:position.count);i+=3){const ids=[0,1,2].map(k=>old?old.getX(i+k):i+k);a.fromBufferAttribute(position,ids[0]).applyMatrix4(shell.matrixWorld);b.fromBufferAttribute(position,ids[1]).applyMatrix4(shell.matrixWorld);c.fromBufferAttribute(position,ids[2]).applyMatrix4(shell.matrixWorld);const center=a.clone().add(b).add(c).multiplyScalar(1/3);const inCabin=Math.abs(center.x)<.81&&center.z> -1.48&&center.z<.90&&center.y>.65;if(!inCabin)keep.push(...ids);}
  shell.geometry=g.clone();shell.geometry.setIndex(keep);shell.geometry.deleteAttribute('color');shell.material=new THREE.MeshStandardMaterial({color:'#171713',roughness:.76,metalness:.05});
+ // Исходная геометрия шелла в сцене больше не участвует: клон держит свои копии
+ // атрибутов. Освобождаем её, только если её не делит другой меш модели.
+ let shared=false;car.traverse(o=>{if(o!==shell&&o.isMesh&&o.geometry===g)shared=true;});
+ if(!shared)g.dispose();
  const cockpit=new THREE.Group();cockpit.name='Detailed atelier interior';scene.add(cockpit);
  const texture=(type)=>{const canvas=document.createElement('canvas');canvas.width=canvas.height=256;const ctx=canvas.getContext('2d');let seed=931;const rnd=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};ctx.fillStyle=type==='cloth'?'#746957':'#808080';ctx.fillRect(0,0,256,256);for(let y=0;y<256;y+=2)for(let x=0;x<256;x+=2){const n=rnd();if(type==='cloth'){const warp=((Math.floor(x/8)+Math.floor(y/8))%4)<2;ctx.fillStyle=warp?`rgba(29,27,22,${.25+n*.4})`:`rgba(205,183,147,${.15+n*.3})`;}else ctx.fillStyle=`rgba(${n>.5?'255,255,255':'0,0,0'},${.1+n*.27})`;ctx.fillRect(x,y,1+rnd(),1+rnd());}const tex=new THREE.CanvasTexture(canvas);tex.wrapS=tex.wrapT=THREE.RepeatWrapping;tex.repeat.set(type==='cloth'?3:5,type==='cloth'?4:5);tex.anisotropy=8;return tex;};
  const grain=texture('leather'),weave=texture('cloth');weave.colorSpace=THREE.SRGBColorSpace;

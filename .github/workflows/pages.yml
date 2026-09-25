@@ -22,12 +22,23 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Установить зависимости
+        run: npm ci
       - name: Check website assets and code
-        run: node scripts/check.mjs
+        run: npm run check
       # Версия к адресам CSS и JS: иначе после выкладки браузер смешивает
       # новый HTML со старыми стилями из кэша (у GitHub Pages max-age=600).
       - name: Stamp asset versions
         run: node scripts/stamp-assets.mjs "${GITHUB_SHA::7}"
+      # Из выкладки убираем то, что страница не запрашивает: 3D-сцену (модули,
+      # бандл, GLB, исходники three), неиспользуемые логотипы, шрифты и картинки
+      # прошлых версий. В репозитории они остаются.
+      - name: Отсеять неиспользуемые файлы
+        run: node scripts/prune-deploy.mjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:

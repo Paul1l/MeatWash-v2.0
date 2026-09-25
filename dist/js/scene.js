@@ -114,7 +114,9 @@ export async function createScene(canvas){
   if(disposed)return;disposed=true;water.dispose();garage.dispose();
   const textures=new Set(),materials=new Set(),geometries=new Set();
   scene.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)for(const m of Array.isArray(o.material)?o.material:[o.material]){materials.add(m);Object.values(m).forEach(v=>{if(v?.isTexture)textures.add(v);});}});
-  textures.forEach(t=>t.dispose());materials.forEach(m=>m.dispose());geometries.forEach(g=>g.dispose());unused.forEach(m=>m.dispose());renderer.dispose();
+  textures.forEach(t=>t.dispose());materials.forEach(m=>m.dispose());geometries.forEach(g=>g.dispose());unused.forEach(m=>m.dispose());
+  // Контекст WebGL освобождаем явно: браузер держит ограниченное число контекстов.
+  renderer.forceContextLoss();renderer.dispose();
  }};
 }
 

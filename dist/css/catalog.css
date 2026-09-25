@@ -1,71 +1,104 @@
 /* Editorial price list: native disclosures, no dependency on the 3D scene. */
-.strip .card>img{filter:saturate(.78);will-change:auto}
+/* Фотографии услуг — без тонирования: цвет студии и работы показываем как есть. */
+.strip .card>img{will-change:auto}
 .strip .card--interior>img{object-position:58% 54%}
 .strip .card--polish>img{object-position:50% 60%}
-.strip .card--ceramic>img{object-position:50% 75%;filter:saturate(.45) brightness(.8)}
-.strip .card::after{background:linear-gradient(180deg,rgba(8,8,8,.65),transparent 38%,transparent 60%,rgba(8,8,8,.7))}
+.strip .card--ceramic>img{object-position:50% 75%}
+.strip .card::after{background:linear-gradient(180deg,rgb(var(--black-rgb)/.65),transparent 38%,transparent 60%,rgb(var(--black-rgb)/.7))}
 .strip .card__caption{color:var(--ivory)}
-.catalog{padding:110px var(--gutter);background:#0d0b0a;color:var(--ivory)}
+.catalog{padding:var(--section-y) var(--gutter);background:var(--black-2);color:var(--ivory)}
 .catalog [id],.catalog{scroll-margin-top:calc(var(--header-h) + 24px)}
 .catalog__heading{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:end;margin-bottom:80px}
 .catalog h2{font-size:clamp(34px,3.9vw,60px);line-height:1.1;letter-spacing:.006em;margin-top:24px}
-.catalog__heading>p{max-width:44ch;justify-self:end;font-size:15px;line-height:1.9;color:var(--muted)}
+.catalog__heading>p{max-width:44ch;justify-self:end;font-size:15px;line-height:1.65;color:var(--muted)}
 .catalog__section{display:grid;grid-template-columns:26% 1fr;gap:7%;padding-top:50px;margin-top:65px;border-top:1px solid var(--line)}
 .catalog__aside h3,.catalog__concierge h3{font-size:clamp(26px,2.5vw,40px);line-height:1.2;margin:20px 0}
-.catalog__aside p,.catalog__expanded>p,.catalog__note,.catalog__concierge p{font-size:13px;line-height:1.85;color:var(--muted)}
-.catalog__aside .link-arrow{margin-top:24px;font-size:12px}
+.catalog__aside p,.catalog__expanded>p,.catalog__note,.catalog__concierge p{font-size:13px;line-height:1.65;color:var(--muted)}
+.catalog__aside .link-arrow{margin-top:18px;font-size:12px}
+.catalog__aside .link-arrow:hover span{transform:translateY(3px)}
 .catalog__content{min-width:0}
 .body-types{display:flex;flex-wrap:wrap;gap:8px;border:0;padding:0;margin:0 0 18px;min-width:0}
 .body-types legend{font-size:10px;letter-spacing:.15em;color:var(--muted);padding:0 0 15px}
 .body-types label{position:relative;cursor:pointer}
 .body-types input{position:absolute;opacity:0;width:1px;height:1px}
-.body-types span{display:block;padding:10px 14px;border:1px solid var(--line);font-size:12px;transition:background .2s}
-.body-types input:checked+span{background:var(--burgundy);border-color:#76373c;color:var(--ivory)}
+/* Чип типа кузова — цель 44px по высоте, кегль и рамка те же. */
+.body-types span{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:1px solid var(--line);font-size:12px;transition:background .2s}
+.body-types input:checked+span{background:var(--burgundy);border-color:var(--beige);color:var(--ivory)}
 .body-types input:focus-visible+span{outline:2px solid var(--ivory);outline-offset:3px}
 .catalog__selection{font-size:11px;color:var(--muted);margin-bottom:24px}
 .catalog__entry{border-bottom:1px solid var(--line)}
 .catalog__entry summary{display:grid;grid-template-columns:24px minmax(0,1fr) auto auto 14px;gap:15px;align-items:center;list-style:none;padding:25px 0;cursor:pointer}
 .catalog__entry summary::-webkit-details-marker{display:none}
-.catalog__entry summary:focus-visible{outline:1px solid var(--ivory);outline-offset:5px}
+.catalog__entry summary:focus-visible{outline:2px solid var(--ivory);outline-offset:5px}
 .catalog__number{font-size:10px;color:var(--muted)}
 .catalog__name{font-size:16px;line-height:1.5}
 .catalog__time,.catalog__count{font-size:11px;color:var(--muted);white-space:nowrap}
 .catalog__price{font-size:15px;white-space:nowrap;font-variant-numeric:tabular-nums}
 .catalog__toggle{font-size:20px;line-height:1;color:var(--beige);text-align:center;transition:transform .2s}
 .catalog__entry[open] .catalog__toggle{transform:rotate(45deg)}
-.catalog__entry[open] .catalog__name{color:#fff2df}
+.catalog__entry[open] .catalog__name{color:var(--ivory-3)}
 .catalog__expanded{padding:0 0 30px 39px}
 .program-includes{padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:12px 22px;margin:22px 0 26px}
 .program-includes li{font-size:12px;color:var(--ivory);line-height:1.7;position:relative;padding-left:14px}
 .program-includes li::before{content:'—';position:absolute;left:0;color:var(--muted)}
-.catalog__expanded .btn{height:40px;font-size:12px}
+.catalog__expanded .btn{height:44px;font-size:12px}
 .service-group summary{grid-template-columns:24px minmax(0,1fr) auto 14px}
 .catalog__prices{margin:18px 0 24px}
-.catalog__prices>div{display:grid;grid-template-columns:1fr auto;gap:28px;padding:14px 0;border-bottom:1px solid rgba(233,223,208,.08);font-size:13px;line-height:1.65}
+.catalog__prices>div{display:grid;grid-template-columns:1fr auto;gap:28px;padding:14px 0;border-bottom:1px solid rgb(var(--ivory-rgb)/.08);font-size:13px;line-height:1.6}
 .catalog__prices dd{white-space:nowrap;font-variant-numeric:tabular-nums}
 .catalog__note{margin-top:24px;font-size:11px}
-.catalog__extra{display:flex;justify-content:space-between;gap:25px;align-items:center;padding:30px 0;font-size:14px}
+.catalog__extra{display:flex;justify-content:space-between;gap:25px;align-items:center;padding:24px 0;font-size:14px}
 .catalog__extra small{display:block;font-size:11px;color:var(--muted);margin-top:8px}
 .catalog__extra button{font-size:11px;white-space:nowrap}
 .catalog__concierge{margin-top:70px;border-top:1px solid var(--line);padding-top:50px;display:flex;align-items:center;justify-content:space-between;gap:40px}
 .catalog__concierge>div{max-width:64ch}
 .catalog__concierge>.btn{flex-shrink:0}
-.visit-notes{background:var(--ivory-2);color:var(--ink);display:grid;grid-template-columns:repeat(3,1fr);gap:50px;padding:55px var(--gutter) 80px}
+/* Волосяная линия и воздух: два светлых блока подряд иначе слипаются. */
+.visit-notes{background:var(--ivory-2);color:var(--ink);border-top:1px solid var(--line-ink);display:grid;grid-template-columns:repeat(3,1fr);gap:50px;padding:var(--section-y) var(--gutter)}
 .visit-notes article{border-top:1px solid var(--line-ink);padding-top:28px}
-.visit-notes .eyebrow{color:var(--ink-soft);font-size:9px}
+.visit-notes .eyebrow{color:var(--ink-soft);font-size:10px}
 .visit-notes h3{font-size:24px;margin:18px 0}
-.visit-notes p{font-size:13px;line-height:1.85;color:var(--ink-soft)}
-.visit-notes .link-arrow{margin-top:20px;font-size:12px}
-.location__detail{font-size:12px;line-height:1.8;color:var(--ink-soft);margin:16px 0}
-.location__phone{display:block;font-size:14px;margin-bottom:20px}
-.location__book{margin-right:20px}
+.visit-notes p{font-size:13px;line-height:1.65;color:var(--ink-soft)}
+.visit-notes .link-arrow{margin-top:14px;font-size:12px}
+.location__detail{font-size:12px;line-height:1.6;color:var(--ink-soft);margin:16px 0}
+/* Телефон — тоже цель нажатия: 44px по высоте, кегль прежний. */
+.location__phone{display:inline-flex;align-items:center;min-height:44px;font-size:14px;margin-bottom:6px}
 .location__photo{position:relative;display:block;min-width:0}
-.location__photo img{position:absolute;inset:0;filter:saturate(.9) brightness(.96)}
+.location__photo img{position:absolute;inset:0}
 .location__photo--myasnitskaya img{object-position:48% 50%}
 .location__photo--technopark img{object-position:42% 62%}
-.location__photo>span{position:absolute;bottom:0;left:0;right:0;padding:42px 18px 18px;background:linear-gradient(transparent,rgba(8,8,8,.78));color:var(--ivory);font-size:11px;letter-spacing:.025em}
-.location__photo:focus-visible{outline:2px solid var(--burgundy);outline-offset:3px}
+.location__photo>span{position:absolute;bottom:0;left:0;right:0;padding:42px 18px 18px;background:linear-gradient(transparent,rgb(var(--black-rgb)/.78));color:var(--ivory);font-size:11px;letter-spacing:.025em}
 @media(max-width:800px) and (orientation:portrait){.location__photo{height:260px}.location__photo--technopark img{object-position:50% 65%}}
-.service-all-prices{display:inline-block;margin:22px 0;font-size:12px}
-@media(max-width:1100px){.catalog__section{grid-template-columns:22% 1fr;gap:5%}.catalog__entry summary{gap:10px}.catalog__name{font-size:14px}.catalog__time{display:none}.program-entry summary{grid-template-columns:22px minmax(0,1fr) auto 14px}.visit-notes{gap:25px}}
-@media(max-width:800px){.catalog{padding:64px 20px}.catalog__heading{grid-template-columns:1fr;gap:24px;margin-bottom:44px}.catalog__heading>p{justify-self:start;font-size:13px;max-width:46ch}.catalog__section{grid-template-columns:1fr;gap:30px;padding-top:32px;margin-top:40px}.catalog__aside h3 br{display:none}.catalog__aside h3{font-size:30px}.catalog__aside h3 br::after{content:' '}.catalog__aside p{max-width:44ch}.catalog__expanded{padding-left:0}.program-includes{grid-template-columns:1fr}.catalog__entry summary{padding:22px 0}.catalog__price{font-size:13px}.catalog__prices>div{gap:18px;font-size:12px}.body-types{gap:6px}.body-types span{padding:9px 11px;font-size:11px}.catalog__extra{align-items:flex-start;flex-direction:column;gap:12px}.catalog__concierge{flex-direction:column;align-items:flex-start;gap:24px}.visit-notes{grid-template-columns:1fr;gap:28px;padding:20px 20px 60px}.catalog__count{font-size:10px}}
+.service-all-prices{display:inline-flex;margin:16px 0;font-size:12px}
+/* До 1100px время программы уходило совсем. Теперь оно стоит под названием. */
+@media(max-width:1100px){
+ .catalog__section{grid-template-columns:22% 1fr;gap:5%}
+ .catalog__entry summary{gap:10px 12px}
+ .catalog__name{font-size:14px}
+ .program-entry summary{grid-template-columns:22px minmax(0,1fr) auto 14px;row-gap:2px}
+ .program-entry .catalog__number{grid-area:1/1}
+ .program-entry .catalog__name{grid-area:1/2}
+ .program-entry .catalog__time{grid-area:2/2}
+ .program-entry .catalog__price{grid-area:1/3/3/4}
+ .program-entry .catalog__toggle{grid-area:1/4/3/5}
+ .visit-notes{gap:25px}
+}
+@media(max-width:800px){
+ .catalog__heading{grid-template-columns:1fr;gap:24px;margin-bottom:44px}
+ .catalog__heading>p{justify-self:start;font-size:13px;max-width:46ch}
+ .catalog__section{grid-template-columns:1fr;gap:30px;padding-top:32px;margin-top:40px}
+ .catalog__aside h3 br{display:none}
+ .catalog__aside h3{font-size:30px}
+ .catalog__aside p{max-width:44ch}
+ .catalog__expanded{padding-left:0}
+ .program-includes{grid-template-columns:1fr}
+ .catalog__entry summary{padding:20px 0}
+ .catalog__price{font-size:13px}
+ .catalog__prices>div{gap:18px;font-size:12px}
+ .body-types{gap:6px}
+ .body-types span{padding:0 13px;font-size:11px}
+ .catalog__extra{align-items:flex-start;flex-direction:column;gap:12px}
+ .catalog__concierge{flex-direction:column;align-items:flex-start;gap:24px}
+ .visit-notes{grid-template-columns:1fr;gap:28px}
+ .catalog__count{font-size:10px}
+}

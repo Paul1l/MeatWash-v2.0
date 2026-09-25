@@ -7,7 +7,10 @@ const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),dist=resolve(ro
 const html=await readFile(resolve(dist,'index.html'),'utf8');
 const ids=new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]));
 const failures=[];
-for(const [,url] of html.matchAll(/(?:src|href)="([^"]+)"/g)){
+// Локальные адреса страницы: src, href, srcset и постер статичного режима.
+const urls=[...html.matchAll(/(?:src|href|data-static-src)="([^"]+)"/g)].map(m=>m[1]);
+for(const [,set] of html.matchAll(/srcset="([^"]+)"/g))urls.push(...set.split(',').map(part=>part.trim().split(/\s+/)[0]));
+for(const url of urls){
  if(/^(https?:|tel:|data:)/.test(url))continue;
  if(url.startsWith('#')){if(!ids.has(url.slice(1)))failures.push(`Missing anchor: ${url}`);continue;}
  try{await stat(resolve(dist,url));}catch{failures.push(`Missing file: ${url}`);}
@@ -21,10 +24,13 @@ for(const filename of await readdir(resolve(dist,'js'))){
   try{await stat(resolve(dist,'js',url));}catch{failures.push(`Missing module: ${url}`);}
  }
 }
-for(const name of ['style.css','cinematic.css','catalog.css']){
+// url() во всех таблицах стилей, которые подключает страница.
+const stylesheets=[...html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*href="css\/([^"]+)"/g)].map(m=>m[1]);
+assert(stylesheets.length>=6,'Stylesheets not found in index.html');
+for(const name of stylesheets){
  const css=await readFile(resolve(dist,'css',name),'utf8');
  for(const [,url] of css.matchAll(/url\(['"]?([^)'"\s]+)['"]?\)/g)){
-  try{await stat(resolve(dist,'css',url));}catch{failures.push(`Missing CSS asset: ${url}`);}
+  try{await stat(resolve(dist,'css',url));}catch{failures.push(`Missing CSS asset: ${name}: ${url}`);}
  }
 }
 const content=JSON.parse(await readFile(resolve(dist,'assets/meatwash-content.json')));
@@ -41,17 +47,42 @@ for(const prices of content.programPrices)assert(html.includes(`data-prices="${p
 assert.equal([...html.matchAll(/data-price-item/g)].length,39);
 const config=await import('data:text/javascript;base64,'+Buffer.from(await readFile(resolve(dist,'js/config.js'),'utf8')).toString('base64'));
 assert.deepEqual(Object.values(config.STOPS),[0,.2,.4,.6,.8,1]);
-assert.equal(config.CAMERA_STOPS.length,6);
-assert.deepEqual(config.CAMERA_STOPS[0],config.CAMERA_STOPS[5],'Hero must open on the final Porsche overview');
-assert(!/<img[^>]*\ssrc="assets\/img\/hero-hq\.webp"/.test(html),'Photographic hero must not load in normal mode');
 assert.equal(Object.keys(config.SERVICES).length,4);
 const sourcePrices=new Set([...content.programs.map(x=>x[1]),...content.groups.flatMap(g=>g.items.map(x=>x[1]))]);
 for(const service of Object.values(config.SERVICES))for(const [,price] of service.prices)assert(sourcePrices.has(price),'Unsupported price '+price);
-assert(html.includes(content.booking),'Real booking link missing');
-const model=await readFile(resolve(dist,'assets/porsche-930-optimized.glb'));
-const gltf=JSON.parse(model.subarray(20,20+model.readUInt32LE(12)).toString());
-assert(gltf.extensionsRequired.includes('EXT_meshopt_compression'));
-for(const surface of ['Object_113','Object_9','Object_30'])assert(gltf.nodes.some(node=>node.name===surface),'Missing Porsche surface '+surface);
-assert((await readFile(resolve(dist,'js/main.js'),'utf8')).includes("import('./scene.bundle.js')"));
+// Гараж услуг: цены «от» — только из JSON.
+for(const zone of config.ZONES)assert(sourcePrices.has(zone.from),'Unsupported garage price '+zone.id+' '+zone.from);
+
+// Витрина на фотографиях: каждый кадр из config.js есть в двух размерах.
+const shots=new Set([...config.LADDER.map(step=>step.shot),config.SHOT_BASE,config.FILM_OPEN,...Object.keys(config.SHOT_FOCUS)]);
+for(const spec of Object.values(config.ZONE_SHOTS)){shots.add(spec.shot);if(spec.pair){shots.add(spec.pair.before);shots.add(spec.pair.after);}}
+for(const id of shots)for(const file of [`assets/shots/${id}.webp`,`assets/shots/${id}-s.webp`]){
+ try{await stat(resolve(dist,file));}catch{failures.push('Missing stage shot: '+file);}
+}
+assert.equal(config.LADDER.length,6);
+
+// Модули, которые реально грузит страница: скрипты из index.html и всё, что они импортируют.
+const modules=new Set([...html.matchAll(/<script\b[^>]*\bsrc="js\/([^"]+)"/g)].map(m=>m[1]));
+for(const name of modules){
+ const text=await readFile(resolve(dist,'js',name),'utf8');
+ for(const [,url] of text.matchAll(/(?:from\s*|import\()['"]\.\/([^'"]+)['"]/g))modules.add(url);
+}
+const pageCode=[html,...await Promise.all([...modules].map(name=>readFile(resolve(dist,'js',name),'utf8')))].join('\n');
+// 3D-сцены на странице больше нет: ни бандла, ни three, ни модели.
+assert(modules.has('stage.js'),'Page must load the photo stage (stage.js)');
+for(const name of ['scene.bundle.js','scene.js','garage.js','interior.js','water.js'])assert(!modules.has(name),'3D module is loaded by the page: '+name);
+assert(!/porsche-930|\.glb\b|importmap|vendor\/build|vendor\/examples/.test(pageCode),'Page still references the 3D scene');
+
+// У площадок разные компании в yclients: общий адрес открывает только одну из них.
+const bookings=new Set();
+for(const location of content.locations){
+ assert(/^https:\/\/n\d+\.yclients\.com\/company\/\d+\//.test(location.booking||''),'Missing yclients link for '+location.id);
+ assert(html.includes(`href="${location.booking}"`),'Booking link for '+location.id+' missing on the page');
+ bookings.add(location.booking);
+}
+assert.equal(bookings.size,content.locations.length,'Branches must have different booking links');
+// Любая другая ссылка на yclients (например, общая n975571.yclients.com) — ошибка.
+for(const [url] of pageCode.matchAll(/https?:\/\/[\w.-]*yclients\.com[^"'\s<)]*/g))assert(bookings.has(url),'Unexpected yclients link on the page: '+url);
+
 assert.equal(failures.length,0,failures.join('\n'));
-console.log('PASS: JS syntax, module paths, local assets, anchors, six camera stops, four services, supplied prices and booking destination.');
+console.log(`PASS: JS syntax, module paths, local assets (src, srcset, CSS url), anchors, six scroll stops, four services, supplied and garage prices, ${shots.size} stage shots, no 3D on the page, both branch booking destinations, no shared yclients link.`);

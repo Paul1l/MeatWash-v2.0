@@ -45,14 +45,23 @@ export function createStage(mount) {
   let current = null;     // что на нём показано
   let split = 50;         // положение шторки, %
   let sweepRaf = 0;       // автопроезд шторки в режиме показа
-  const seen = new Set(); // уже загруженные кадры
+  const seen = new Map(); // кадр → обещание его загрузки
 
+  // Возвращает обещание: main.js по нему понимает, что витрина готова,
+  // а при ошибке загрузки уходит в статичную версию.
   const preload = (id) => {
-    if (!id || seen.has(id)) return;
-    seen.add(id);
+    if (!id) return Promise.resolve();
+    if (seen.has(id)) return seen.get(id);
     const i = new Image();
     i.decoding = 'async';
+    const loaded = new Promise((resolve, reject) => {
+      i.onload = resolve;
+      i.onerror = () => reject(new Error(`Кадр витрины не загрузился: ${id}`));
+    });
+    loaded.catch(() => {});   // ошибку разбирает тот, кто ждёт; фоновая подгрузка молчит
     i.src = SRC(id, SMALL());
+    seen.set(id, loaded);
+    return loaded;
   };
 
   // Кадр меняется на «спящем» слое, и только потом слои меняются местами.
