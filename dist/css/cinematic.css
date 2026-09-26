@@ -101,6 +101,8 @@ body.menu-open { overflow:hidden; }
 }
 @media(max-height:560px) and (orientation:landscape) {
   .chapter { top:55%; width:36vw; }
+  /* Глава выше свободной высоты под шапкой — номер уходил под неё. */
+  .chapter__index { display:none; }
   .chapter__title { font-size:34px; margin-top:8px; }
   .chapter__lead { font-size:15px; margin-top:12px; }
   .chapter__text { font-size:12px; }
@@ -130,7 +132,7 @@ body.menu-open { overflow:hidden; }
 .static-experience .scene__poster { display:block; height:100svh; }
 /* min-height, а не height: на низком экране крупный hero с кнопками не влезал
    в 100svh, и следующая глава перекрывала «Записаться». */
-.static-experience .hero { position:relative; left:auto; bottom:auto; min-height:100svh; padding:60svh var(--gutter) 70px; max-width:none; }
+.static-experience .hero { position:relative; left:auto; right:auto; bottom:auto; min-height:100svh; padding:60svh var(--gutter) 70px; max-width:none; }
 .static-experience .chapter { position:relative; inset:auto; min-height:90svh; width:100%; opacity:1; padding:20svh 11.5vw 10svh; transform:none; background:linear-gradient(90deg,var(--black),transparent 80%),var(--static-image) center/cover; pointer-events:auto; }
 .static-experience .chapter[data-chapter=body] { --static-image:url('../assets/shots/cf-foam-crop.webp'); }
 .static-experience .chapter[data-chapter=interior] { --static-image:url('../assets/shots/cf-interior-seat.webp'); }

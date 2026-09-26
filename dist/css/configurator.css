@@ -344,6 +344,13 @@ body.cfg-film .cfg-stage{ pointer-events:none; }
   .cfg__scroll{ flex:0 0 auto; overflow:visible; -webkit-mask-image:none; mask-image:none; }
   .cfg__note{ display:none; }
 }
+/* Узкий телефон в альбомной (568×320, 667×375): нижний лист низкий, и flex
+   ужимал вкладки и список работ в ноль. Лист прокручивается целиком. */
+@media (max-width:720px) and (orientation:landscape){
+  .cfg > *{ flex-shrink:0; }
+  .cfg__scroll{ flex:0 0 auto; overflow:visible; -webkit-mask-image:none; mask-image:none; }
+  .cfg__note{ display:none; }
+}
 
 /* Ноутбук с низким окном (1366×657, 1280×720): панель ниже шапки, и на список
    работ оставалась одна строка. Подзаголовок и подписи наборов убираем —
