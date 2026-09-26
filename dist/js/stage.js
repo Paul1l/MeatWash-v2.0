@@ -11,6 +11,7 @@
 //   sweep(ms)      — шторка сама проезжает кадр, когда идёт показ
 
 import { SHOT_FOCUS } from './config.js';
+import { splitText, gripShift } from './proof.js';
 
 const SRC = (id, small) => `assets/shots/${id}${small ? '-s' : ''}.webp`;
 const SMALL = () => innerWidth <= 900;
@@ -27,7 +28,8 @@ export function createStage(mount) {
         <img class="stage__pairimg" data-after alt="">
         <div class="stage__clip" aria-hidden="true"><img class="stage__pairimg" data-before alt=""></div>
         <div class="stage__handle" role="slider" tabindex="0"
-             aria-label="Сравнение до и после" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+             aria-label="Сравнение до и после" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"
+             aria-valuetext="${splitText(50)}">
           <span class="stage__grip" aria-hidden="true"></span>
         </div>
         <span class="stage__tag stage__tag--b" aria-hidden="true">до</span>
@@ -42,6 +44,7 @@ export function createStage(mount) {
   const imgA = mount.querySelector('[data-after]');
   const clip = mount.querySelector('.stage__clip');
   const handle = mount.querySelector('.stage__handle');
+  const grip = mount.querySelector('.stage__grip');
 
   let onLayer = layers[0];  // слой, который сейчас виден
   let current = null;     // что на нём показано
@@ -90,23 +93,45 @@ export function createStage(mount) {
     split = Math.max(0, Math.min(100, v));
     clip.style.clipPath = `inset(0 ${100 - split}% 0 0)`;
     handle.style.left = `${split}%`;
+    grip.style.translate = `${gripShift(split, pair.clientWidth)}px 0`;
     handle.setAttribute('aria-valuenow', Math.round(split));
+    handle.setAttribute('aria-valuetext', splitText(split));
   }
 
   // ── шторка ────────────────────────────────────────────────────────────────
+  // Мышь тянет сразу. Палец — только когда жест явно горизонтальный: у кадра
+  // touch-action: pan-y, и вертикальный свайп остаётся прокруткой страницы.
+  const TOUCH_SLOP = 8;
   let dragging = false;
+  let touch = null;   // касание, по которому ещё не ясно: шторка или прокрутка
   const fromEvent = (e) => {
     const r = pair.getBoundingClientRect();
-    const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
-    return (x / r.width) * 100;
+    return ((e.clientX - r.left) / r.width) * 100;
   };
-  const onMove = (e) => { if (dragging) { setSplit(fromEvent(e)); e.preventDefault(); } };
-  const onUp = () => { dragging = false; root.classList.remove('is-dragging'); };
-  const onDown = (e) => { cancelAnimationFrame(sweepRaf); dragging = true; root.classList.add('is-dragging'); setSplit(fromEvent(e)); };
+  const grab = (e) => { cancelAnimationFrame(sweepRaf); dragging = true; root.classList.add('is-dragging'); setSplit(fromEvent(e)); };
+  const onMove = (e) => {
+    if (dragging) { setSplit(fromEvent(e)); e.preventDefault(); return; }
+    if (!touch || e.pointerId !== touch.id) return;
+    const dx = Math.abs(e.clientX - touch.x), dy = Math.abs(e.clientY - touch.y);
+    if (dx > TOUCH_SLOP && dx > dy) { touch = null; grab(e); e.preventDefault(); }
+    else if (dy > TOUCH_SLOP) touch = null;
+  };
+  const onUp = (e) => {
+    // Короткое касание без сдвига — как щелчок: шторка встаёт в точку.
+    if (touch && e.type === 'pointerup' && e.pointerId === touch.id && !pair.hidden) { cancelAnimationFrame(sweepRaf); setSplit(fromEvent(e)); }
+    touch = null; dragging = false; root.classList.remove('is-dragging');
+  };
+  const onDown = (e) => {
+    if (e.pointerType !== 'touch') { grab(e); return; }
+    touch = { id: e.pointerId, x: e.clientX, y: e.clientY };
+  };
+  const onResize = () => { if (!pair.hidden) setSplit(split); };
 
   pair.addEventListener('pointerdown', onDown);
   addEventListener('pointermove', onMove, { passive: false });
   addEventListener('pointerup', onUp);
+  addEventListener('pointercancel', onUp);
+  addEventListener('resize', onResize);
   handle.addEventListener('keydown', (e) => {
     const step = e.shiftKey ? 10 : 3;
     if (e.key === 'ArrowLeft') { setSplit(split - step); e.preventDefault(); }
@@ -163,6 +188,8 @@ export function createStage(mount) {
       cancelAnimationFrame(sweepRaf);
       removeEventListener('pointermove', onMove);
       removeEventListener('pointerup', onUp);
+      removeEventListener('pointercancel', onUp);
+      removeEventListener('resize', onResize);
     },
   };
 }

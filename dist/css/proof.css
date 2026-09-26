@@ -51,7 +51,8 @@
   width: 44px; margin-left: -22px;
   display: grid; place-items: center;
   cursor: ew-resize;
-  touch-action: none;
+  /* Как у кадра: вертикальный свайп с ручки — прокрутка, горизонтальный — шторка. */
+  touch-action: pan-y;
 }
 .ba__handle::before {
   content: ''; position: absolute; top: 0; bottom: 0; left: 50%;

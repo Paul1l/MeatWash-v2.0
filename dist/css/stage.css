@@ -44,7 +44,9 @@
 }
 
 /* ── шторка «до/после» ─────────────────────────────────────────────────── */
-.stage__pair{ position:absolute; inset:0; touch-action:none; cursor:ew-resize; }
+/* pan-y: вертикальный свайп по кадру — прокрутка страницы, шторку тянет
+   только горизонтальный жест (порог в stage.js). */
+.stage__pair{ position:absolute; inset:0; touch-action:pan-y; cursor:ew-resize; }
 .stage__pair[hidden]{ display:none; }
 .stage__pairimg{
   position:absolute; inset:0; width:100%; height:100%;

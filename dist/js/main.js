@@ -93,7 +93,8 @@ function apply(progress,force=false){
  const p=clamp(progress);state.progress=p;
  const intro=1-smooth(p,.008,.07);
  setVisibility(hero,intro,true,force);setVisibility(bar,1-smooth(p,.015,.09),true,force);
- const index=Math.min(5,Math.floor(p*5+.5));
+ // Номер главы 1–4: на 0.90–0.91 (финал, навигация ещё видна) активной остаётся последняя.
+ const index=Math.min(4,Math.floor(p*5+.5));
  section.firstElementChild.style.setProperty('--shade',String(smooth(p,.06,.15)*(1-smooth(p,.90,.97))));
  for(let i=0;i<chapters.length;i++){
   const center=(i+1)/5,d=Math.abs(p-center);
@@ -126,7 +127,8 @@ function staticExperience(){
  state.progress=0;
  for(const el of [...chapters,hero,finale]){el.style.opacity='1';el.style.transform='';el.inert=false;el.setAttribute('aria-hidden','false');}
  poster.hidden=false;poster.style.opacity='1';posterImage.style.transform='';
- posterImage.src=posterImage.dataset.staticSrc;
+ // До 900px — кадр 900 px, как у витрины (stage.js) и статичных глав (cinematic.css).
+ posterImage.src=innerWidth<=900?posterImage.dataset.staticSrc.replace(/\.webp$/,'-s.webp'):posterImage.dataset.staticSrc;
  section.dataset.mode=(motion.matches||forceStatic)?'reduced-motion':'static-fallback';
  if(below)scrollBy(0,anchor.getBoundingClientRect().top-anchorTop);
  updateChrome();
@@ -177,11 +179,44 @@ async function start(){
  }
 }
 
+// Поворот телефона: высота трека сцены меняется (780svh ↔ 690svh, и сами svh),
+// а scrollY остаётся прежним — человек оказывался в другой главе. Помним, где
+// он был в прошлой раскладке, и после смены высоты трека возвращаем его туда же:
+// внутри сцены — на ту же долю прогресса, ниже сцены — в то же место своего блока
+// (ScrollTrigger.refresh() восстанавливает прежний scrollY, и без этого человек,
+// читавший прайс, уезжал на тысячи пикселей).
+const afterScene=[...document.querySelectorAll('main > section:not(#scene), body > footer')];
+let track=null;
+function remember(){
+ if(staticMode){track=null;return;}
+ const y=scrollY,top=section.offsetTop,h=section.offsetHeight;
+ track={y,top,h,vh:innerHeight,block:null,px:0,share:0};
+ if(y<=top+h-innerHeight)return;
+ const block=afterScene.find(el=>el.offsetTop+el.offsetHeight>y);
+ if(block){track.block=block;track.px=y-block.offsetTop;track.share=track.px/Math.max(1,block.offsetHeight);}
+}
+function keepSceneProgress(){
+ if(staticMode||!track)return;
+ const h=section.offsetHeight;
+ if(h===track.h)return;
+ const was=Math.max(1,track.h-track.vh),share=(track.y-track.top)/was,{block}=track;
+ let target=null;
+ if(share>=0&&share<=1)target=section.offsetTop+share*range();
+ else if(block)target=block.offsetTop+(track.px<0?track.px:track.share*block.offsetHeight);
+ if(target!==null){
+  // Сначала пересчёт ScrollTrigger, потом прокрутка: refresh() возвращает
+  // позицию, запомненную до поворота, и перебил бы нашу.
+  window.ScrollTrigger?.refresh();
+  scrollTo({top:Math.round(target),behavior:'instant'});
+ }
+ remember();
+}
 let resizeFrame=0;
+addEventListener('resize',keepSceneProgress,{signal:controller.signal});
 addEventListener('resize',()=>{cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(()=>{document.documentElement.dataset.viewport=String(innerWidth);scene?.resize();if(!staticMode)apply(state.progress);});},{signal:controller.signal});
-addEventListener('scroll',updateChrome,{passive:true,signal:controller.signal});
+addEventListener('scroll',()=>{updateChrome();remember();},{passive:true,signal:controller.signal});
 motion.addEventListener('change',()=>{if(motion.matches)staticExperience();else location.reload();},{signal:controller.signal});
 addEventListener('pagehide',event=>{if(event.persisted)return;destroyed=true;cancelAnimationFrame(resizeFrame);tween?.kill();trigger?.kill();scene?.dispose();lcpObserver?.disconnect();cleanupUI();cleanupProof();configurator.destroy();controller.abort();},{once:true});
 document.fonts.ready.then(()=>window.ScrollTrigger?.refresh());
-updateChrome();
+updateChrome();remember();
 if(document.readyState==='loading')addEventListener('DOMContentLoaded',start,{once:true});else start();

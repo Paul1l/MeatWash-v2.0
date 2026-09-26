@@ -4,7 +4,16 @@ export function setupUI(goToStop) {
  const abort=new AbortController(), options={signal:abort.signal};
  const $=s=>document.querySelector(s);
  const menu=$('#mobile-menu'), burger=$('#burger'), booking=$('#booking'), details=$('#service-dialog');
- const closeMenu=()=>{ menu.hidden=true; burger.setAttribute('aria-expanded','false'); burger.setAttribute('aria-label','Открыть меню'); document.body.classList.remove('menu-open'); };
+ // Открытое меню держит фокус: всё, что под ним (страница, подвал, нижняя кнопка,
+ // ссылка «к услугам»), на это время inert — Tab после последнего пункта не уходит
+ // под меню, а чтение с экрана не видит закрытое им содержимое.
+ const behindMenu=()=>document.querySelectorAll('.skip-link, main, body > footer, .mobile-cta');
+ const setMenu=open=>{
+   menu.hidden=!open; burger.setAttribute('aria-expanded',String(open)); burger.setAttribute('aria-label',open?'Закрыть меню':'Открыть меню');
+   document.body.classList.toggle('menu-open',open);
+   behindMenu().forEach(el=>{el.inert=open;});
+ };
+ const closeMenu=()=>{ if(menu.hidden) return; const inside=menu.contains(document.activeElement); setMenu(false); if(inside) burger.focus({preventScroll:true}); };
  // Окно открыто только что: второй клик двойного клика (или двойного тапа)
  // приходится в ту же точку — по фону он закрывал окно, по ссылке филиала
  // сам открывал запись. Такие клики по окну игнорируем.
@@ -20,7 +29,8 @@ export function setupUI(goToStop) {
    $('#booking-title').textContent='Записаться';
    setContext(note); lead.hidden=true; hint.hidden=false; branches.hidden=false;
    show(booking);
-   branches.querySelector('a')?.focus();
+   // Фокус на заголовке, а не на Мясницкой: иначе она выглядела выбранной по умолчанию.
+   $('#booking-title').focus({preventScroll:true});
  };
  // Разговор с администратором: телефоны без онлайн-записи.
  const openMembership=(title='')=>{
@@ -29,7 +39,7 @@ export function setupUI(goToStop) {
    setContext(''); lead.hidden=false; hint.hidden=true; branches.hidden=true;
    show(booking);
  };
- burger.addEventListener('click',()=>{const open=menu.hidden;menu.hidden=!open;burger.setAttribute('aria-expanded',String(open));burger.setAttribute('aria-label',open?'Закрыть меню':'Открыть меню');document.body.classList.toggle('menu-open',open);},options);
+ burger.addEventListener('click',()=>{ if(menu.hidden) setMenu(true); else closeMenu(); },options);
  document.querySelector('.body-types')?.addEventListener('change',event=>{
   const input=event.target;if(input.name!=='body-type')return;
   const index=Number(input.value);

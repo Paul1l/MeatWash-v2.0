@@ -139,6 +139,13 @@ body.menu-open { overflow:hidden; }
 .static-experience .chapter[data-chapter=polish] { --static-image:url('../assets/shots/cf-rq-bay.webp'); }
 .static-experience .chapter[data-chapter=ceramic] { --static-image:url('../assets/shots/cf-bead-macro.webp'); }
 .static-experience .finale { position:relative; inset:auto; opacity:1; padding:70px var(--gutter); }
+/* До 900px — кадры 900 px (-s), как у витрины в stage.js: 1600 px телефону не нужны. */
+@media(max-width:900px) {
+  .static-experience .chapter[data-chapter=body] { --static-image:url('../assets/shots/cf-foam-crop-s.webp'); }
+  .static-experience .chapter[data-chapter=interior] { --static-image:url('../assets/shots/cf-interior-seat-s.webp'); }
+  .static-experience .chapter[data-chapter=polish] { --static-image:url('../assets/shots/cf-rq-bay-s.webp'); }
+  .static-experience .chapter[data-chapter=ceramic] { --static-image:url('../assets/shots/cf-bead-macro-s.webp'); }
+}
 /* Статичные главы на телефоне — на общем поле страницы, а не на 11.5vw. */
 @media(max-width:800px) and (orientation:portrait) { .static-experience .chapter { padding:16svh var(--gutter) 10svh; } }
 @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; } }

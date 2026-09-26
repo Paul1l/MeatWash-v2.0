@@ -8,7 +8,9 @@
 .strip .card::after{background:linear-gradient(180deg,rgb(var(--black-rgb)/.65),transparent 38%,transparent 60%,rgb(var(--black-rgb)/.7))}
 .strip .card__caption{color:var(--ivory)}
 .catalog{padding:110px var(--gutter);background:var(--black-2);color:var(--ivory)}
-.catalog [id],.catalog{scroll-margin-top:calc(var(--header-h) + 24px)}
+/* Отступ под шапку при переходе к якорю один — scroll-padding-top у html (style.css).
+   Здесь был ещё scroll-margin-top: они складывались, и над #services оставался
+   кусок предыдущего блока. */
 .catalog__heading{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:end;margin-bottom:80px}
 .catalog h2{font-size:clamp(34px,3.9vw,60px);line-height:1.1;letter-spacing:.006em;margin-top:24px}
 .catalog__heading>p{max-width:44ch;justify-self:end;font-size:15px;line-height:1.9;color:var(--muted)}

@@ -18,9 +18,20 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preload" href="assets/fonts/arsenal-sc-bold.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/arsenal.woff2" as="font" type="font/woff2" crossorigin>
-<!-- Первый кадр витрины ставится фоном из JS, поэтому браузер сам его не найдёт. -->
-<link rel="preload" href="assets/shots/cf-hero-dirty.webp" as="image" media="(min-width: 901px) and (prefers-reduced-motion: no-preference)">
-<link rel="preload" href="assets/shots/cf-hero-dirty-s.webp" as="image" media="(max-width: 900px) and (prefers-reduced-motion: no-preference)">
+<!-- Первый кадр витрины ставится фоном из JS, поэтому браузер сам его не найдёт.
+     Подгрузка заранее — только если витрина будет: в статичном режиме (?motion=reduce,
+     «уменьшить движение», Save-Data) кадр не нужен, а media у preload не видит параметр
+     адреса. Скрипт стоит до таблиц стилей, поэтому выполняется сразу, их не ожидая.
+     Размер кадра — по тому же правилу, что в stage.js: innerWidth <= 900 — малый. -->
+<script>
+(function(){
+ var c=navigator.connection;
+ if(/[?&]motion=reduce(&|$)/.test(location.search)||(c&&c.saveData)||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+ var l=document.createElement('link');l.rel='preload';l.as='image';
+ l.href=innerWidth<=900?'assets/shots/cf-hero-dirty-s.webp':'assets/shots/cf-hero-dirty.webp';
+ document.head.appendChild(l);
+})();
+</script>
 <link rel="icon" href="assets/favicon-bull.png" sizes="512x512" type="image/png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="stylesheet" href="css/style.css">
@@ -343,12 +354,13 @@
 <dialog class="dialog" id="booking" aria-labelledby="booking-title">
   <form method="dialog"><button class="dialog__close" aria-label="Закрыть">×</button></form>
   <span class="eyebrow" lang="en">MEATWASH / CAR CARE CLUB</span>
-  <h2 id="booking-title">Записаться</h2>
+  <!-- Начальный фокус — на заголовке: на ссылке филиала он выглядел выбором по умолчанию. -->
+  <h2 id="booking-title" tabindex="-1" autofocus>Записаться</h2>
   <p class="dialog__context" id="booking-context" hidden></p>
   <p class="dialog__lead" id="booking-lead" hidden>Администратор ответит на вопросы и подберёт время.</p>
   <p class="dialog__lead" id="booking-hint">Выберите студию. Услугу и время — в её онлайн-записи.</p>
   <div class="dialog__branches">
-    <a class="dialog__branch" href="https://n975571.yclients.com/company/906067/personal/select-services" target="_blank" rel="noopener noreferrer" autofocus><strong>Мясницкая</strong><span>ул. Мясницкая, 11</span></a>
+    <a class="dialog__branch" href="https://n975571.yclients.com/company/906067/personal/select-services" target="_blank" rel="noopener noreferrer"><strong>Мясницкая</strong><span>ул. Мясницкая, 11</span></a>
     <a class="dialog__branch" href="https://n1982508.yclients.com/company/1743348/personal/select-services" target="_blank" rel="noopener noreferrer"><strong>Технопарк</strong><span>пр-т Андропова, 8, стр. 2</span></a>
   </div>
   <div class="dialog__phones">
