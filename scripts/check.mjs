@@ -68,7 +68,8 @@ for(const name of modules){
  for(const [,url] of text.matchAll(/(?:from\s*|import\()['"]\.\/([^'"]+)['"]/g))modules.add(url);
 }
 const pageCode=[html,...await Promise.all([...modules].map(name=>readFile(resolve(dist,'js',name),'utf8')))].join('\n');
-// 3D-сцены на странице больше нет: ни бандла, ни three, ни модели.
+// 3D-сцены нет: страница работает на фото-витрине. Если кто-то вернёт
+// модули сцены, three или модель — проверка это поймает.
 assert(modules.has('stage.js'),'Page must load the photo stage (stage.js)');
 for(const name of ['scene.bundle.js','scene.js','garage.js','interior.js','water.js'])assert(!modules.has(name),'3D module is loaded by the page: '+name);
 assert(!/porsche-930|\.glb\b|importmap|vendor\/build|vendor\/examples/.test(pageCode),'Page still references the 3D scene');

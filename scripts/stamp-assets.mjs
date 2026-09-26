@@ -28,7 +28,7 @@ for (const page of ['index.html', 'credits.html']) {
 
 // Модули: относительные import и import().
 for (const name of await readdir(resolve(dist, 'js'))) {
-  if (!name.endsWith('.js') || name === 'scene.bundle.js') continue;
+  if (!name.endsWith('.js')) continue;
   const file = resolve(dist, 'js', name);
   let js = await readFile(file, 'utf8');
   js = stamp(js, /(\bfrom\s*['"])(\.\/[^'"?#]+\.js)(['"])/g);
