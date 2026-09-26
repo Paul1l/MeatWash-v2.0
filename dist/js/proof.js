@@ -90,10 +90,12 @@ function wire(fig) {
     if (e.key === 'End') { taught = true; cancelAnimationFrame(raf); set(100); e.preventDefault(); }
   });
 
-  // Показательный проезд: туда и обратно, один раз за появление.
+  // Показательный проезд: туда и обратно при каждом появлении карточки,
+  // пока человек сам не тронул шторку. Один раз за загрузку легко пролистать.
+  let playing = false;
   function teach() {
-    if (taught) return;
-    taught = true;
+    if (taught || playing) return;
+    playing = true;
     const started = performance.now();
     const span = 2600;
     const ease = (x) => (x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
@@ -106,14 +108,22 @@ function wire(fig) {
           : 12 + ease((t - .72) / .28) * (home - 12);
       set(k);
       if (t < 1) raf = requestAnimationFrame(tick);
+      else playing = false;
     };
     raf = requestAnimationFrame(tick);
+  }
+  // Карточка ушла с экрана посреди проезда — шторка возвращается на место.
+  function rest() {
+    if (!playing) return;
+    cancelAnimationFrame(raf);
+    playing = false;
+    if (!taught) set(home);
   }
 
   set(home);
   // Ширина кадра поменялась — круг ручки у края пересчитывается.
   const refit = () => set(split);
-  return { fig, teach, refit, stop: () => cancelAnimationFrame(raf) };
+  return { fig, teach, rest, refit, stop: () => cancelAnimationFrame(raf) };
 }
 
 export function setupProof(root = document) {
@@ -125,10 +135,11 @@ export function setupProof(root = document) {
   if (!quiet && 'IntersectionObserver' in window) {
     observer = new IntersectionObserver((entries) => {
       for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
         const item = items.find((i) => i.fig === entry.target);
-        setTimeout(() => item?.teach(), 420);
-        observer.unobserve(entry.target);
+        if (!item) continue;
+        clearTimeout(item.wait);
+        if (entry.isIntersecting) item.wait = setTimeout(item.teach, 420);
+        else item.rest();
       }
     }, { threshold: .45 });
     items.forEach((i) => observer.observe(i.fig));
@@ -137,5 +148,5 @@ export function setupProof(root = document) {
   const onResize = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(() => items.forEach((i) => i.refit())); };
   addEventListener('resize', onResize);
 
-  return () => { observer?.disconnect(); removeEventListener('resize', onResize); cancelAnimationFrame(frame); items.forEach((i) => i.stop()); };
+  return () => { observer?.disconnect(); removeEventListener('resize', onResize); cancelAnimationFrame(frame); items.forEach((i) => { clearTimeout(i.wait); i.stop(); }); };
 }
