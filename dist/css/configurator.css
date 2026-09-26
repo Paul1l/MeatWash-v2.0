@@ -148,9 +148,11 @@ body.cfg-open .scene__cfg{ right:auto; left:clamp(14px,3vw,40px); }
 .cfg__pairhint::before{ content:'↔'; font-size:15px; color:#e9dfd0; }
 .cfg.has-pair .cfg__pairhint{ display:flex; }
 @media (max-width:720px){
-  /* Над нижней кнопкой записи, а не поверх неё. */
-  .scene__cfg{ top:auto; right:auto; bottom:calc(env(safe-area-inset-bottom,0px) + 62px); left:50%; transform:translateX(-50%); }
-  body.cfg-open .scene__cfg{ bottom:auto; top:calc(env(safe-area-inset-top,0px) + 76px); }
+  /* Правый верх под шапкой, как на десктопе. Внизу по центру кнопка ложилась
+     на крупный вордмарк hero, главы и «Все услуги ↓». */
+  .scene__cfg{ top:calc(var(--header-h) + 12px); bottom:auto; right:var(--gutter); left:auto; transform:none; }
+  /* Открыта панель — кнопка уходит влево на ту же высоту: справа «Скрыть панель». */
+  body.cfg-open .scene__cfg{ top:calc(var(--header-h) + 12px); bottom:auto; }
 }
 
 /* Шапка панели с крестиком. */
@@ -279,8 +281,9 @@ body.cfg-cinema .cfg-fold:hover{ opacity:1; }
   .cfg__act{ display:grid; grid-template-columns:1fr 1fr; gap:6px; }
 
   /* Кнопка кинорежима уходит наверх: внизу её накрывал нижний лист. */
-  .cfg-fold{ bottom:auto; top:calc(env(safe-area-inset-top,0px) + 76px); right:14px; }
-  body.cfg-open .scene__cfg{ left:14px; transform:none; }
+  /* На одной линии с кнопкой «Гараж услуг» (она слева) и с целью нажатия 44px. */
+  .cfg-fold{ bottom:auto; top:calc(var(--header-h) + 12px); right:var(--gutter); display:inline-flex; align-items:center; min-height:44px; }
+  body.cfg-open .scene__cfg{ left:var(--gutter); right:auto; transform:none; }
 
   .cfg-stage{ left:16px; right:16px; width:auto; bottom:calc(env(safe-area-inset-bottom,0) + 84px); }
 }

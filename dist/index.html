@@ -57,10 +57,11 @@
 <main id="top">
 
 <!-- ============ CINEMATIC SCENE: hero → THE BODY ============ -->
-<section class="scene" id="scene" aria-label="Porsche 911 — больше, чем мойка">
+<section class="scene" id="scene" aria-label="MEATWASH — больше, чем мойка">
   <div class="scene__sticky">
     <div class="scene__poster" aria-hidden="true" hidden><img data-static-src="assets/shots/cf-hero-clean.webp" width="1600" height="900" alt="Автомобиль после ухода MEATWASH"></div>
-    <div class="stage-mount" aria-hidden="true"></div>
+    <!-- aria-hidden — на слоях-картинках внутри (stage.js): ручка шторки должна быть доступна. -->
+    <div class="stage-mount"></div>
     <div class="scene__shade" aria-hidden="true"></div>
     <a class="scene__skip" href="#services">Все услуги ↓</a>
     <button class="scene__cfg" type="button" data-cfg-open aria-expanded="false" aria-controls="cfg-panel">Гараж услуг</button>
@@ -198,7 +199,7 @@
   </div>
 </section>
 
-<!-- ============ ABOUT ============ -->
+<!-- ============ CATALOG ============ -->
 <!-- CATALOG:START -->
 <section class="catalog" id="services" aria-labelledby="catalog-title">
  <div class="catalog__heading"><div><p class="eyebrow" lang="en">MEATWASH / CAR CARE</p><h2 id="catalog-title">Искусство ухода.<br>В деталях.</h2></div><p>Пять программ мойки и весь спектр детейлинга. Выберите уход под состояние автомобиля — от регулярной мойки до восстановления и защиты.</p></div>
@@ -345,6 +346,7 @@
   <h2 id="booking-title">Записаться</h2>
   <p class="dialog__context" id="booking-context" hidden></p>
   <p class="dialog__lead" id="booking-lead" hidden>Администратор ответит на вопросы и подберёт время.</p>
+  <p class="dialog__lead" id="booking-hint">Выберите студию. Услугу и время — в её онлайн-записи.</p>
   <div class="dialog__branches">
     <a class="dialog__branch" href="https://n975571.yclients.com/company/906067/personal/select-services" target="_blank" rel="noopener noreferrer" autofocus><strong>Мясницкая</strong><span>ул. Мясницкая, 11</span></a>
     <a class="dialog__branch" href="https://n1982508.yclients.com/company/1743348/personal/select-services" target="_blank" rel="noopener noreferrer"><strong>Технопарк</strong><span>пр-т Андропова, 8, стр. 2</span></a>

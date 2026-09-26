@@ -75,9 +75,11 @@
   letter-spacing: .12em;
   color: var(--text);
 }
-.ba__frame:hover .ba__grip, .ba.is-dragging .ba__grip { transform: scale(1.08); background: rgba(77, 13, 17, .72); }
+/* Активная ручка — фирменный красный, как у шторки в витрине (stage.css). */
+.ba__frame:hover .ba__grip, .ba.is-dragging .ba__grip { transform: scale(1.08); background: rgb(var(--burgundy-2-rgb) / .85); }
+/* Фокус — глобальный (2px светлый), только на круге ручки, а не на всей полосе. */
 .ba__handle:focus-visible { outline: none; }
-.ba__handle:focus-visible .ba__grip { outline: 1px solid var(--beige); outline-offset: 4px; }
+.ba__handle:focus-visible .ba__grip { outline: 2px solid var(--ivory); outline-offset: 3px; }
 
 .ba__tag {
   position: absolute; top: 14px;

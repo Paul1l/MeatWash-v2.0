@@ -16,7 +16,7 @@
   --black: #080808;
   --black-2: #0d0b0a;
   --burgundy: #4d0d11;
-  --burgundy-2: #861A22;   /* фирменный красный логобука — заливка главной кнопки */
+  --burgundy-2: #861A22;   /* фирменный красный логобука — акценты (ручка шторки, «Вы выбрали») */
   --burgundy-3: #6b141c;
   --ivory: #e9dfd0;
   --ivory-2: #ece5d8;
@@ -40,8 +40,6 @@
   --font-sans: 'Arsenal', 'Inter', 'Helvetica Neue', Arial, sans-serif;
 
   --gutter: clamp(20px, 5.4vw, 104px);   /* 35px in the 652px mock-up */
-  /* Вертикальный ритм секций. Плотные блоки берут его долю, а не свои числа. */
-  --section-y: clamp(56px, 7vw, 110px);
   --header-h: clamp(64px, 6.9vw, 108px);
   --radius: 3px;
   --ease: cubic-bezier(.22, .61, .36, 1);
@@ -88,18 +86,18 @@ a, button { -webkit-tap-highlight-color: transparent; }
 }
 .btn > span { line-height: 1; transition: transform var(--t) var(--ease); }
 .btn:hover > span { transform: translateX(4px); }
-/* Главная кнопка: фирменный красный + светлая рамка. Прежний #4d0d11 на чёрном
-   давал 1.15:1 и не читался как кнопка; рамка даёт границе ~5:1. */
-.btn--fill { background: var(--burgundy-2); color: var(--ivory); border-color: rgb(var(--ivory-rgb) / .45); }
-.btn--fill:hover { background: var(--burgundy-3); border-color: var(--ivory); }
-.btn--fill:active { background: var(--burgundy); border-color: var(--ivory); }
+/* Главная кнопка — бордо, как в версии Vercel. Заливка #4d0d11 на чёрном даёт
+   всего 1.15:1, поэтому край кнопки держит светлая рамка (~5:1). */
+.btn--fill { background: var(--burgundy); color: var(--ivory); border-color: rgb(var(--ivory-rgb) / .45); }
+.btn--fill:hover { background: var(--burgundy-3); }
 .btn--ghost { border-color: rgb(var(--ivory-rgb) / .5); color: var(--ivory); background: rgb(var(--black-rgb) / .18); }
 .btn--ghost:hover { border-color: var(--ivory); background: rgb(var(--ivory-rgb) / .08); }
 .btn--ink { border-color: rgb(var(--ink-rgb) / .55); color: var(--ink); background: transparent; }
 .btn--ink:hover { background: var(--ink); color: var(--ivory); }
-.btn--ink-fill { background: var(--ink); color: var(--ivory); border-color: rgb(var(--ivory-rgb) / .22); padding-right: 10px; }
-.btn--ink-fill:hover { background: var(--black); }
-.btn__circle { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--ivory); color: var(--ink); font-size: 13px; }
+/* Кнопка клуба — почти чёрное бордо версии Vercel, в тон фону секции. */
+.btn--ink-fill { background: #1a0709; color: var(--ivory); border-color: rgba(255, 255, 255, .16); padding-right: 10px; }
+.btn--ink-fill:hover { background: #0d0304; }
+.btn__circle { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--ivory); color: #1a0709; font-size: 13px; }
 /* min-height, а не padding: цель нажатия 44px без изменения визуального веса. */
 .link-arrow { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: clamp(11px, .95vw, 14px); }
 .link-arrow span { transition: transform var(--t) var(--ease); }
@@ -113,7 +111,7 @@ a, button { -webkit-tap-highlight-color: transparent; }
   border-bottom: 1px solid transparent;
   transition: background var(--t) var(--ease), border-color var(--t) var(--ease);
 }
-.header.is-solid, body.menu-open .header { background: rgb(var(--black-rgb) / .86); border-bottom-color: var(--line); backdrop-filter: blur(10px); }
+.header.is-solid, body.menu-open .header { background: rgb(var(--black-rgb) / .86); border-bottom-color: rgba(255, 255, 255, .08); backdrop-filter: blur(10px); }
 .header .brand { flex: 0 0 auto; }
 .nav { display: flex; align-items: center; gap: clamp(22px, 3.2vw, 52px); margin: 0 auto; padding-left: clamp(0px, 4vw, 70px); }
 .nav a { font-size: clamp(12px, .95vw, 14px); color: var(--ivory); transition: opacity var(--t); }
@@ -158,15 +156,15 @@ body.menu-open .burger span:last-child { transform: translateY(-3.5px) rotate(-4
   position: absolute; left: var(--gutter); bottom: clamp(110px, 13.5%, 150px); z-index: 2;
   max-width: min(70vw, 900px);
 }
-/* Слово MEATWASH повторяет знак в шапке, поэтому оно здесь — строка-подпись,
-   а обещание «Уход, который сохраняет ценность» — главная фраза экрана. */
+/* Крупный вордмарк MEATWASH и подзаголовок — как в версии Vercel.
+   Действующие размеры — в cinematic.css (он перекрывает этот файл). */
 .hero__title {
-  font-size: clamp(28px, 3.2vw, 50px); line-height: 1; text-transform: uppercase; letter-spacing: .07em;
+  font-size: clamp(36px, 4.9vw, 72px); line-height: .98; text-transform: uppercase; letter-spacing: .015em;
   color: var(--ivory); text-shadow: 0 2px 40px rgb(var(--black-rgb) / .45);
 }
-.hero__sub { margin-top: clamp(10px, 1.3vw, 18px); font-size: clamp(20px, 2.5vw, 38px); line-height: 1.15; font-weight: 400; color: var(--ivory); max-width: 26ch; text-shadow: 0 2px 40px rgb(var(--black-rgb) / .45); }
+.hero__sub { margin-top: clamp(10px, 1.4vw, 20px); font-size: clamp(15px, 1.75vw, 25px); font-weight: 400; color: var(--ivory); text-shadow: 0 2px 40px rgb(var(--black-rgb) / .45); }
 /* Одна заливка и одна текстовая ссылка: уровни не спорят между собой. */
-.hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: clamp(14px, 1.8vw, 28px); margin-top: clamp(18px, 2.2vw, 32px); }
+.hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: clamp(14px, 1.8vw, 28px); margin-top: 28px; }
 .hero__more {
   display: inline-flex; align-items: center; gap: 10px; min-height: 44px;
   font-size: clamp(12px, .95vw, 14px); color: var(--ivory);
@@ -260,8 +258,9 @@ button.card { width: 100%; text-align: left; appearance: none; }
 /* ---------- Locations ---------- */
 .locations {
   display: grid; grid-template-columns: 1fr 1fr; gap: clamp(6px, 1vw, 14px);
-  /* Поля — общий --gutter (было 8px слева на 390px), рамка — доля ритма секции. */
-  padding: calc(var(--section-y) * .4) var(--gutter);
+  /* Узкая рамка вокруг карточек — как в версии Vercel. На телефоне поля
+     по общему --gutter (см. блок portrait ниже). */
+  padding: clamp(8px, 1.1vw, 16px) clamp(8px, 1.85vw, 28px);
   /* Прежний тон рамки #e2dacb, собранный из двух токенов палитры. */
   background: var(--ivory-2);
   background: color-mix(in srgb, var(--ivory-2) 82%, var(--beige));
@@ -280,7 +279,7 @@ button.card { width: 100%; text-align: left; appearance: none; }
 .location__book { margin-top: auto; }
 .location__card .link-arrow + .link-arrow { margin-top: 6px; }
 .location__photo { overflow: hidden; border: 1px solid var(--line-ink); border-left: 0; }
-/* Фотографии студий — без тонирования: фильтры жили в трёх файлах и спорили. */
+/* Тонирование фото студий — одно, в catalog.css (как в версии Vercel). */
 .location__photo img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--ease); }
 .location:hover .location__photo img { transform: scale(1.04); }
 
@@ -300,13 +299,13 @@ button.card { width: 100%; text-align: left; appearance: none; }
   transform: translateY(14px); opacity: .001; transition: transform 1.4s var(--ease), opacity 1.2s var(--ease);
 }
 .membership__card.is-in img { transform: none; opacity: 1; }
-.membership__copy { position: relative; padding: calc(var(--section-y) * .45) var(--gutter) calc(var(--section-y) * .45) 0; }
+.membership__copy { position: relative; padding: clamp(28px, 3vw, 44px) var(--gutter) clamp(28px, 3vw, 44px) 0; }
 .membership__copy h2 { font-size: clamp(24px, 2.3vw, 34px); letter-spacing: .005em; }
 .membership__copy p { margin-top: clamp(12px, 1.4vw, 20px); font-size: clamp(12px, 1.05vw, 16px); line-height: 1.6; color: var(--ivory); max-width: 34ch; }
 .membership__copy .btn { margin-top: clamp(18px, 2vw, 30px); height: clamp(40px, 3.3vw, 50px); font-size: clamp(11px, .95vw, 14px); }
 
 /* ---------- Footer ---------- */
-.footer { position: relative; z-index: 2; background: var(--black); padding: calc(var(--section-y) * .5) var(--gutter) calc(var(--section-y) * .35); }
+.footer { position: relative; z-index: 2; background: var(--black); padding: clamp(26px, 3.4vw, 50px) var(--gutter) clamp(22px, 2.6vw, 36px); }
 .footer__row { display: flex; align-items: center; gap: clamp(20px, 3vw, 48px); }
 .footer__nav { display: flex; gap: clamp(16px, 2.6vw, 44px); margin-left: auto; }
 .footer__nav a { display: inline-flex; align-items: center; min-height: 44px; font-size: clamp(12px, .95vw, 14px); transition: opacity var(--t); }
@@ -324,7 +323,7 @@ button.card { width: 100%; text-align: left; appearance: none; }
 .footer__branch h3 { font-size: clamp(16px, 1.3vw, 20px); letter-spacing: .02em; }
 .footer__branch p { margin-top: 8px; font-size: 12px; line-height: 1.7; color: var(--muted); }
 .footer__branch a { display: inline-flex; align-items: center; min-height: 44px; margin-top: 2px; font-size: 14px; color: var(--ivory); }
-.footer__base { display: flex; justify-content: space-between; gap: 24px; margin-top: clamp(24px, 3vw, 44px); font-size: clamp(11px, .82vw, 12px); color: var(--muted); }
+.footer__base { display: flex; justify-content: space-between; gap: 24px; margin-top: clamp(28px, 3.6vw, 56px); font-size: clamp(11px, .82vw, 12px); color: var(--muted); }
 
 /* ---------- Dialog ---------- */
 .dialog {
@@ -443,8 +442,8 @@ button.card { width: 100%; text-align: left; appearance: none; }
   .scene__shade { background: linear-gradient(180deg, rgb(var(--black-rgb) / .6), rgb(var(--black-rgb) / 0) 30%, rgb(var(--black-rgb) / 0) 55%, rgb(var(--black-rgb) / .9) 100%); }
   .scene__sticky::after { background: linear-gradient(0deg, var(--black) 0%, rgb(var(--black-rgb) / .9) 32%, rgb(var(--black-rgb) / 0) 62%); }
   .hero { left: var(--gutter); right: var(--gutter); bottom: 200px; max-width: none; }
-  .hero__title { font-size: clamp(24px, 6.4vw, 30px); letter-spacing: .1em; }
-  .hero__sub { font-size: clamp(19px, 5.6vw, 24px); max-width: none; }
+  .hero__title { font-size: clamp(34px, 10.4vw, 48px); }
+  .hero__sub { font-size: 14px; }
   .hero-bar { left: var(--gutter); right: var(--gutter); bottom: 80px; grid-template-columns: 1fr; row-gap: 16px; }
   .hero-bar__scroll { display: none; }
   .chapter { top: auto; bottom: 84px; transform: none; left: var(--gutter); right: var(--gutter); width: auto; }
@@ -458,6 +457,7 @@ button.card { width: 100%; text-align: left; appearance: none; }
   .about__copy { padding: 28px var(--gutter) 8px; }
   .about__stats { grid-column: auto; margin: 0 var(--gutter); padding: 24px 0 32px; flex-direction: row; gap: 14px; }
   .about__stats dd { white-space: normal; font-size: 10px; }
+  .locations { padding: 8px var(--gutter); }
   .location { grid-template-columns: 1fr; }
   .location__card { border-right: 1px solid var(--line-ink); border-bottom: 0; }
   .location__photo { border-left: 1px solid var(--line-ink); border-top: 0; height: 180px; }
@@ -467,9 +467,8 @@ button.card { width: 100%; text-align: left; appearance: none; }
 /* Small landscape phones */
 @media (max-width: 900px) and (orientation: landscape) and (max-height: 500px) {
   .hero { bottom: 74px; }
-  .hero__title { font-size: clamp(20px, 3.2vw, 26px); }
-  .hero__sub { font-size: clamp(16px, 2.6vw, 21px); margin-top: 8px; }
-  .hero__actions { margin-top: 12px; }
+  .hero__title { font-size: clamp(26px, 6vw, 40px); }
+  .hero__sub { font-size: 13px; margin-top: 6px; }
   .hero-bar { bottom: 14px; }
   .chapter__title { font-size: clamp(26px, 5.5vw, 40px); }
   .chapter__lead { margin-top: 10px; font-size: 14px; }

@@ -11,14 +11,14 @@ export function setupUI(goToStop) {
  let openedAt=0;
  const show=dialog=>{ if(dialog.open) return; dialog.showModal(); openedAt=performance.now(); };
  const settling=e=>e.detail>1||performance.now()-openedAt<400;
- const context=$('#booking-context'), lead=$('#booking-lead'), branches=booking.querySelector('.dialog__branches');
+ const context=$('#booking-context'), lead=$('#booking-lead'), hint=$('#booking-hint'), branches=booking.querySelector('.dialog__branches');
  // Что именно выбрал человек — только текстом, без разметки.
  const setContext=note=>{ context.textContent=note?'Вы выбрали: '+note:''; context.hidden=!note; };
  // Запись: филиал выбирается здесь, потому что у площадок разные компании в yclients.
  const openBooking=(note='')=>{
    closeMenu(); details.close();
    $('#booking-title').textContent='Записаться';
-   setContext(note); lead.hidden=true; branches.hidden=false;
+   setContext(note); lead.hidden=true; hint.hidden=false; branches.hidden=false;
    show(booking);
    branches.querySelector('a')?.focus();
  };
@@ -26,7 +26,7 @@ export function setupUI(goToStop) {
  const openMembership=(title='')=>{
    closeMenu(); details.close();
    $('#booking-title').textContent=title||'Meatwash Car Care Club';
-   setContext(''); lead.hidden=false; branches.hidden=true;
+   setContext(''); lead.hidden=false; hint.hidden=true; branches.hidden=true;
    show(booking);
  };
  burger.addEventListener('click',()=>{const open=menu.hidden;menu.hidden=!open;burger.setAttribute('aria-expanded',String(open));burger.setAttribute('aria-label',open?'Закрыть меню':'Открыть меню');document.body.classList.toggle('menu-open',open);},options);

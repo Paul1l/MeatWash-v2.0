@@ -58,7 +58,9 @@
   box-shadow:0 0 0 1px rgba(8,8,8,.45), 0 0 24px rgba(8,8,8,.5);
   cursor:ew-resize;
 }
-.stage__handle:focus-visible{ outline:2px solid #e9dfd0; outline-offset:4px; }
+/* Фокус как у шторок «До и после»: 2px светлый на круге ручки. */
+.stage__handle:focus-visible{ outline:none; }
+.stage__handle:focus-visible .stage__grip{ outline:2px solid var(--ivory); outline-offset:3px; }
 .stage__grip{
   position:absolute; top:50%; left:50%; width:46px; height:46px;
   transform:translate(-50%,-50%); border-radius:50%;
@@ -72,7 +74,8 @@
 }
 .stage__grip::before{ left:12px; border-right:7px solid #e9dfd0; }
 .stage__grip::after { right:12px; border-left:7px solid #e9dfd0; }
-.is-dragging .stage__grip{ background:#861A22; border-color:#861A22; }
+/* Тот же цвет активной ручки, что у шторок «До и после» (proof.css). */
+.is-dragging .stage__grip{ background:rgb(var(--burgundy-2-rgb) / .85); }
 
 .stage__tag{
   /* Метки сверху: внизу кадра идёт подпись работы во время показа. */

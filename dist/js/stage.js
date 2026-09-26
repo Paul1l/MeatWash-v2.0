@@ -17,19 +17,21 @@ const SMALL = () => innerWidth <= 900;
 const FOCUS = (id) => SHOT_FOCUS[id] || '50% 50%';
 
 export function createStage(mount) {
+  // Скрыты от чтения с экрана только картинки и метки: сама ручка-слайдер
+  // должна оставаться доступной, поэтому aria-hidden не на контейнере.
   mount.innerHTML = `
     <div class="stage">
-      <div class="stage__layer is-on" data-layer></div>
-      <div class="stage__layer" data-layer></div>
+      <div class="stage__layer is-on" data-layer aria-hidden="true"></div>
+      <div class="stage__layer" data-layer aria-hidden="true"></div>
       <div class="stage__pair" hidden>
         <img class="stage__pairimg" data-after alt="">
-        <div class="stage__clip"><img class="stage__pairimg" data-before alt=""></div>
+        <div class="stage__clip" aria-hidden="true"><img class="stage__pairimg" data-before alt=""></div>
         <div class="stage__handle" role="slider" tabindex="0"
              aria-label="Сравнение до и после" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
           <span class="stage__grip" aria-hidden="true"></span>
         </div>
-        <span class="stage__tag stage__tag--b">до</span>
-        <span class="stage__tag stage__tag--a">после</span>
+        <span class="stage__tag stage__tag--b" aria-hidden="true">до</span>
+        <span class="stage__tag stage__tag--a" aria-hidden="true">после</span>
       </div>
     </div>`;
 

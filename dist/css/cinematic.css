@@ -1,8 +1,8 @@
 /* Cinematic layer. Reference typography/grid remain in style.css. */
 html { scroll-behavior:auto; }
 .header,.header.is-solid, body.menu-open .header { background:var(--black); backdrop-filter:none; }
-/* Путь до прайса был почти восемь экранов прокрутки — доли глав те же, трек короче. */
-.scene { height:600svh; }
+/* Длина трека — как в версии Vercel: доли глав в config.js считаются от неё. */
+.scene { height:780svh; }
 .scene__sticky { height:100svh; isolation:isolate; }
 .scene__poster { position:absolute; inset:0; width:100%; height:100%; }
 .scene__poster { display:none; z-index:1; pointer-events:none; overflow:hidden; }
@@ -12,11 +12,12 @@ html { scroll-behavior:auto; }
 .scene__sticky::after { z-index:1; background:linear-gradient(90deg,var(--black) 0%,rgb(var(--black-rgb)/.96) 20%,rgb(var(--black-rgb)/.55) 32%,transparent 50%); }
 .hero { bottom:14.5%; }
 .hero__eyebrow { color:var(--muted); font-size:11px; letter-spacing:.25em; margin-bottom:20px; }
-.hero__actions { margin-top:clamp(20px,2.4vw,32px); }
-/* Размеры hero живут здесь (этот файл перекрывает style.css). MEATWASH уже есть
-   знаком в шапке — в hero это разреженная строка-подпись, главная фраза — обещание. */
-.hero__title { font-size:clamp(20px,1.9vw,30px); line-height:1; letter-spacing:.16em; }
-.hero__sub { margin-top:14px; font-size:clamp(28px,3.3vw,52px); }
+/* Размеры hero живут здесь (этот файл перекрывает style.css) и повторяют
+   версию Vercel: крупный вордмарк MEATWASH, под ним подзаголовок.
+   Ряд «Записаться + Услуги и цены» стоит на отступе Vercel-кнопки .hero__booking. */
+.hero__actions { margin-top:28px; }
+.hero__title { font-size:clamp(46px,5.5vw,90px); line-height:.96; letter-spacing:.005em; }
+.hero__sub { margin-top:32px; }
 .hero-bar { bottom:4%; }
 .hero-bar { display:flex; justify-content:flex-end; }
 .chapter { width:min(30vw,440px); top:50%; transform:translateY(-50%); }
@@ -55,7 +56,7 @@ body.menu-open { overflow:hidden; }
 /* Цель 44px; отрицательные поля не дают ссылке раздвинуть строку подвала. */
 .credits-link { display:inline-flex; align-items:center; justify-content:center; min-width:44px; min-height:44px; margin-block:-12px; }
 .dialog::backdrop { backdrop-filter:none; }
-@media(min-width:1700px) { .hero__title { font-size:32px; } .hero__sub { font-size:56px; } }
+@media(min-width:1700px) { .hero__title { font-size:108px; } }
 @media(max-width:1100px) { .chapter { left:var(--gutter); width:37vw; } .chapter__title { font-size:54px; } .chapter-nav { left:var(--gutter); } }
 /* Портрет до 900px: запись — только в нижней кнопке, поэтому в hero и финале её нет.
    Блок стоит выше блока 800px, чтобы телефонные значения перебивали планшетные. */
@@ -68,12 +69,13 @@ body.menu-open { overflow:hidden; }
 }
 @media(max-width:800px) and (orientation:portrait) {
   :root { --gutter:16px; }
-  .scene { height:540svh; }
+  .scene { height:690svh; }
   .header { background:var(--black); border-bottom:1px solid var(--line); }
   .scene__poster img { object-position:55% 35%; }
   .hero { bottom:116px; }
-  .hero__title { font-size:clamp(17px,4.6vw,21px); line-height:1; letter-spacing:.16em; }
-  .hero__sub { margin-top:10px; font-size:clamp(25px,7.2vw,32px); }
+  .hero__title { font-size:clamp(36px,10.4vw,65px); line-height:.95; }
+  .hero__sub { margin-top:16px; font-size:14px; }
+  /* Кнопки записи здесь нет (она внизу экрана) — остаётся ссылка «Услуги и цены». */
   .hero__actions { margin-top:16px; }
   .hero-bar { bottom:85px; row-gap:12px; }
   .chapter { top:auto; bottom:116px; left:var(--gutter); right:var(--gutter); width:auto; transform:none; }
@@ -110,18 +112,25 @@ body.menu-open { overflow:hidden; }
 /* Compact landscape windows need a single-row footer beneath the hero copy. */
 @media(max-width:900px) and (orientation:landscape) {
   .hero { bottom:100px; }
-  .hero__eyebrow { margin-bottom:10px; }
-  .hero__title { font-size:clamp(16px,2.1vw,19px); }
-  .hero__sub { font-size:clamp(21px,3.5vw,30px); margin-top:8px; }
-  .hero__actions { margin-top:14px; }
+  .hero__title { font-size:clamp(30px,6vw,48px); }
+  .hero__sub { font-size:14px; margin-top:14px; }
   .hero-bar { bottom:24px; grid-template-columns:1fr auto; }
+}
+/* Совсем низкий альбом (740×360, 568×320): крупный вордмарк с рядом кнопок
+   упирался в шапку. Размеры шрифта те же, ужимаются только отступы. */
+@media(max-width:900px) and (orientation:landscape) and (max-height:380px) {
+  .hero { bottom:88px; }
+  .hero__eyebrow { margin-bottom:10px; }
+  .hero__actions { margin-top:16px; }
 }
 /* No animation: genuine static frames, with no pinned multi-screen empty track. */
 .static-experience .scene { height:auto; }
 .static-experience .scene__sticky { position:relative; height:auto; overflow:visible; }
 .static-experience .stage-mount,.static-experience .scene__shade,.static-experience .scene__sticky::after,.static-experience .hero-bar,.static-experience .chapter-nav,.static-experience .scene__skip { display:none; }
 .static-experience .scene__poster { display:block; height:100svh; }
-.static-experience .hero { position:relative; left:auto; bottom:auto; height:100svh; padding:60svh var(--gutter) 70px; max-width:none; }
+/* min-height, а не height: на низком экране крупный hero с кнопками не влезал
+   в 100svh, и следующая глава перекрывала «Записаться». */
+.static-experience .hero { position:relative; left:auto; bottom:auto; min-height:100svh; padding:60svh var(--gutter) 70px; max-width:none; }
 .static-experience .chapter { position:relative; inset:auto; min-height:90svh; width:100%; opacity:1; padding:20svh 11.5vw 10svh; transform:none; background:linear-gradient(90deg,var(--black),transparent 80%),var(--static-image) center/cover; pointer-events:auto; }
 .static-experience .chapter[data-chapter=body] { --static-image:url('../assets/shots/cf-foam-crop.webp'); }
 .static-experience .chapter[data-chapter=interior] { --static-image:url('../assets/shots/cf-interior-seat.webp'); }
