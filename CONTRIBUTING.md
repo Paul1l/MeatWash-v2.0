@@ -3,7 +3,7 @@
 Репозиторий открыт для нескольких человек. Ниже — минимум, которого достаточно,
 чтобы не мешать друг другу и не сломать опубликованный макет.
 
-Опубликованный сайт: https://paul1l.github.io/MeatWash-v1.0/
+Опубликованный сайт: https://paul1l.github.io/MeatWash-v2.0/
 Его собирает GitHub Actions из папки `dist` при каждом push в `main`. Всё, что
 попало в `main`, через минуту видит клиент — поэтому напрямую в `main` не пушим.
 
@@ -16,8 +16,8 @@
 ## Первый запуск
 
 ```
-git clone https://github.com/Paul1l/MeatWash-v1.0.git
-cd MeatWash-v1.0
+git clone https://github.com/Paul1l/MeatWash-v2.0.git
+cd MeatWash-v2.0
 npm ci        # нужно только для проверок и пересборки, для просмотра не обязательно
 npm start     # http://127.0.0.1:4173
 ```

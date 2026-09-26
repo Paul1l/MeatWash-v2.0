@@ -53,10 +53,10 @@
 - Цены и факты — только из JSON (цены «от» в гараже тоже проверяются). Не выдумывать цифры,
   отзывы, клиентов, акции, программы лояльности.
 - `canonical`, `og:url`, `og:image`, JSON-LD, `robots.txt`, `sitemap.xml` указывают на
-  GitHub Pages (`paul1l.github.io/MeatWash-v1.0`). Если сайт переедет на другой адрес — менять все.
+  GitHub Pages (`paul1l.github.io/MeatWash-v2.0`). Если сайт переедет на другой адрес — менять все.
 - На Windows `core.autocrlf=true`; `.gitattributes` держит текстовые файлы в LF.
 - `stamp-assets.mjs` при публикации ставит `?v=` только к CSS, JS и относительным import.
-  Кадры `assets/shots` адресуются без версии — это совпадает с `<link rel=preload>` в `<head>`.
+  Кадры `assets/shots` адресуются без версии — это совпадает с preload кадра hero, который добавляет инлайн-скрипт в `<head>` (не при `?motion=reduce`, Save-Data и «уменьшить движение»).
 
 ## Внешний вид
 

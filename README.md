@@ -1,6 +1,6 @@
 # MEATWASH — сайт Car Care Club
 
-Публичный сайт: https://paul1l.github.io/MeatWash-v1.0/
+Публичный сайт: https://paul1l.github.io/MeatWash-v2.0/
 
 Совместная разработка: [CONTRIBUTING.md](CONTRIBUTING.md) — ветки, проверки перед pull request, каталог услуг.
 
